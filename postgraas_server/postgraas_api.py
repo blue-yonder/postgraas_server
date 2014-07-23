@@ -42,8 +42,8 @@ def create_postgres_instance(connection_dict):
     return container_id
 
 def get_hostname():
-    return socket.gethostbyname(socket.gethostname())
-    #return "XXX.XXX.XXX.XXX"
+    #return socket.gethostbyname(socket.gethostname())
+    return "weather-test1"
 
 
 @app.route("/postgraas/one_db_please")
