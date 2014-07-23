@@ -4,6 +4,12 @@ from flask import Flask, request, jsonify
 import docker
 import hashlib
 import socket
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 app = Flask(__name__)
 
 def get_unique_id(connection_dict):
@@ -36,8 +42,8 @@ def create_postgres_instance(connection_dict):
     return container_id
 
 def get_hostname():
-    #return socket.gethostbyname(socket.gethostname())
-    return "XXX.XXX.XXX.XXX"
+    return socket.gethostbyname(socket.gethostname())
+    #return "XXX.XXX.XXX.XXX"
 
 
 @app.route("/postgraas/one_db_please")
@@ -51,6 +57,7 @@ def hello():
     }
     db_credentials['db_id'] = get_unique_id(db_credentials)
     db_credentials['container_id'] = create_postgres_instance(db_credentials)
+    logger.info('created db {}'.format(db_credentials))
     return jsonify(db_credentials)
 
 
