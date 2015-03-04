@@ -27,7 +27,6 @@ def get_open_port():
 def create_postgres_instance(connection_dict):
     #docker run -d -p 5432:5432 -e POSTGRESQL_USER=test -e POSTGRESQL_PASS=oe9jaacZLbR9pN -e POSTGRESQL_DB=test orchardup/postgresql
     c = docker.Client(base_url='unix://var/run/docker.sock',
-                  version='1.12',
                   timeout=10)
     environment = {
         "POSTGRESQL_USER": connection_dict['db_username'],
@@ -35,7 +34,7 @@ def create_postgres_instance(connection_dict):
         "POSTGRESQL_DB": connection_dict['db_name']
     }
     internal_port = 5432
-    container_info = c.create_container('orchardup/postgresql', ports=[internal_port], environment=environment)
+    container_info = c.create_container('postgres', ports=[internal_port], environment=environment)
     container_id = container_info['Id']
     port_dict = {internal_port: connection_dict['port']}
     c.start(container_id, port_bindings=port_dict)
