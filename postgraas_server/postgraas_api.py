@@ -1,9 +1,13 @@
 __author__ = 'neubauer'
-
+import datetime
 from flask import Flask, request, jsonify
 import docker
 import hashlib
 import socket
+import postgraas_server.management_database as database
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.restful import fields, Resource, marshal_with, Api
+
 
 import logging
 
@@ -11,6 +15,39 @@ logger = logging.getLogger(__name__)
 
 
 app = Flask(__name__)
+db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = database.DB_PATH
+
+
+class DBInstance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    creation_timestamp = db.Column(db.DateTime)
+    username = db.Column(db.String(50))
+    password = db.Column(db.String(50))
+    hostname = db.Column(db.String(50))
+    port = db.Column(db.Integer)
+
+    def __init__(self, name):
+        self.name = name
+        self.creation_timestamp = datetime.datetime.now()
+
+db_instance_marshaller = {
+    'id': fields.Integer,
+    'name': fields.String,
+    'creation_timestamp': fields.DateTime(dt_format='rfc822')
+}
+
+class DBInstanceResource(Resource):
+
+    @marshal_with(db_instance_marshaller)
+    def get(self, set_id):
+        entity = DBInstance.query.get(set_id)
+        return entity
+
+
+restful_api = Api(app)
+restful_api.add_resource(DBInstanceResource, "/api/set/<int:set_id>")
 
 def get_unique_id(connection_dict):
     return hashlib.sha1(str(frozenset(connection_dict.items()))).hexdigest()

@@ -2,4 +2,6 @@
 # numpy
 # scipy>=0.9
 flask
-docker-py==0.3.2
+flask-restful
+flask-sqlalchemy
+docker-py>=1.0
