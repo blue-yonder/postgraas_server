@@ -11,8 +11,15 @@ def init_db():
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
     from postgraas_server.postgraas_api import db
+    db.drop_all()
     db.create_all()
     from postgraas_server.postgraas_api import DBInstance
-    admin = DBInstance('admin instance')
+    admin = DBInstance(postgraas_instance_name='PostgraasMetaDB',
+                      db_name='postgraas',
+                      username='postgraas',
+                      password='postgraas12',
+                      hostname='localhost',
+                      port=5432,
+                      container_id='not implented yet...')
     db.session.add(admin)
     db.session.commit()
