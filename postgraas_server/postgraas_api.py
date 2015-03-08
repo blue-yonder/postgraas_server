@@ -66,14 +66,29 @@ class DBInstanceResource(Resource):
         return entity
 
     def delete(self, id):
+        c = docker.Client(base_url='unix://var/run/docker.sock',
+                  timeout=10)
         entity = DBInstance.query.get(id)
         if entity:
             try:
+                container_info = c.inspect_container(entity.container_id)
+                print container_info
+            except APIError as e:
+                if e.response.status_code == 404:
+                    logger.warning("conatiner {} doe not exist, how cold that happen?".format(entity.container_id))
+                    db.session.delete(entity)
+                    db.session.commit()
+                    return {'status': 'sucess', 'msg': 'deleted postgraas instance, but container was not found...'}
+            try:
                 delete_postgres_instance(entity.container_id)
             except APIError as e:
-                logger.warning("error deleting conatiner {}: {}".format(entity.container_id, e.message))
+                logger.warning("error deleting conatiner {}: {}".format(entity.container_id, str(e)))
+                return {'status': 'failed', 'msg': str(e)}
             db.session.delete(entity)
             db.session.commit()
+            return {'status': 'success', 'msg': 'deleted postgraas instance'}
+        else:
+            return {'status': 'failed', 'msg': 'Postgraas instance does not exist {}'.format(id)}
 
 
 
@@ -98,10 +113,12 @@ class DBInstanceListResource(Resource):
             "host": get_hostname(),
             "port": get_open_port()
         }
+        if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']).first():
+            return {'msg': "postgraas_instance_name already exists {}".format(args['postgraas_instance_name']) }
         try:
             db_credentials['container_id'] = create_postgres_instance(db_credentials)
-        except Exception as e:
-            return {'msg': e.message}
+        except APIError as e:
+            return {'msg': str(e)}
         db_entry = DBInstance(postgraas_instance_name=args['postgraas_instance_name'],
                               db_name=args['db_name'],
                               username=args['db_username'],
@@ -109,10 +126,10 @@ class DBInstanceListResource(Resource):
                               hostname=db_credentials['host'],
                               port=db_credentials['port'],
                               container_id=db_credentials['container_id'])
-        #all = DBInstance.query.all()
         print db_entry
         db.session.add(db_entry)
         db.session.commit()
+        db_credentials["postgraas_instance_id"] = db_entry.id
         return db_credentials
 
 restful_api = Api(app)
@@ -137,9 +154,9 @@ def create_postgres_instance(connection_dict):
     c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=10)
     environment = {
-        "POSTGRESQL_USER": connection_dict['db_username'],
-        "POSTGRESQL_PASS": connection_dict['db_pwd'],
-        "POSTGRESQL_DB": connection_dict['db_name']
+        "POSTGRES_USER": connection_dict['db_username'],
+        "POSTGRES_PASS": connection_dict['db_pwd'],
+        "POSTGRES_DB": connection_dict['db_name']
     }
     internal_port = 5432
     container_info = c.create_container('postgres', ports=[internal_port], environment=environment)
@@ -152,11 +169,10 @@ def delete_postgres_instance(container_id):
     #docker run -d -p 5432:5432 -e POSTGRESQL_USER=test -e POSTGRESQL_PASS=oe9jaacZLbR9pN -e POSTGRESQL_DB=test orchardup/postgresql
     c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=10)
-    print c.stop(container_id)
+    print c.remove_container(container_id, force=True)
     return True
 
 def get_hostname():
-    #return socket.gethostbyname(socket.gethostname())
     return "weather-test1"
 
 
