@@ -4,10 +4,9 @@ import unittest
 from mock import patch
 import json
 import postgraas_server.postgraas_api as papi
+import postgraas_server.postgres_instance_driver as pid
 import docker
 from docker.errors import APIError
-from requests import Response
-
 
 
 class TestPostgraasApi(unittest.TestCase):
@@ -39,10 +38,10 @@ class TestPostgraasApi(unittest.TestCase):
             "db_name": 'test_db_name',
             "db_username": 'test_db_username',
             "db_pwd": 'test_db_pwd',
-            "host": papi.get_hostname(),
-            "port": papi.get_open_port()
+            "host": pid.get_hostname(),
+            "port": pid.get_open_port()
         }
-        result = papi.create_postgres_instance(db_credentials)
+        result = pid.create_postgres_instance(db_credentials)
         self.assertEqual(result, 'fy8rfsufusgsufbvluluivhhvsbr')
 
     def test_create_postgres_instance_api(self):
@@ -82,10 +81,10 @@ class TestPostgraasApi(unittest.TestCase):
             "db_name": 'test_db_name',
             "db_username": 'test_db_username',
             "db_pwd": 'test_db_pwd',
-            "host": papi.get_hostname(),
-            "port": papi.get_open_port()
+            "host": pid.get_hostname(),
+            "port": pid.get_open_port()
         }
-        self.assertRaises(APIError, papi.create_postgres_instance, db_credentials)
+        self.assertRaises(APIError, pid.create_postgres_instance, db_credentials)
 
     def test_create_postgres_instance_name_exists(self):
         db_credentials = {

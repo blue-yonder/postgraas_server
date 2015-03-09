@@ -1,0 +1,16 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+  - name: Install base packages
+    apt: name={{ item }} update_cache=no force=no state=installed
+    with_items:
+    - build-essential
+    - ntp
+    - htop
+    - git
+    - python-dev
+    - python-pip
+    - python-pycurl
+    - python-virtualenv
+    - supervisor
