@@ -14,3 +14,13 @@
     - python-pycurl
     - python-virtualenv
     - supervisor
+    - curl
+
+  - name: add backports repository
+    apt_repository: repo='deb http://http.debian.net/debian wheezy-backports main' state=present
+
+  - name: install new kernel from backports
+    apt: name=linux-image-amd64 state=latest default_release=wheezy-backports update_cache=yes
+
+  - name: install docker with evil internetscript
+    shell: curl -sSL https://get.docker.com/ | sh
