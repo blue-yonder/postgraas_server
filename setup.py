@@ -39,7 +39,7 @@ CLASSIFIERS = ['Development Status :: 4 - Beta',
                'Programming Language :: Python']
 
 # Add here console scripts like ['hello_world = postgraas_server.module:function']
-CONSOLE_SCRIPTS = []
+CONSOLE_SCRIPTS = ['hello_world = postgraas_server.create_db:main']
 
 # Versioneer configuration
 versioneer.versionfile_source = os.path.join(MAIN_PACKAGE, '_version.py')

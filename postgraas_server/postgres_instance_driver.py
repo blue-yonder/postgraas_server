@@ -21,7 +21,19 @@ def get_open_port():
         return port
 
 
-def create_postgres_instance(connection_dict):
+def check_container_exists(postgraas_instance_name):
+    c = docker.Client(base_url='unix://var/run/docker.sock',
+                  timeout=30)
+    containers = c.containers()
+    print postgraas_instance_name
+    for container in containers:
+        print container
+        for name in container['Names']:
+            if postgraas_instance_name in name.replace("/", ""):
+                return True
+    return False
+
+def create_postgres_instance(postgraas_instance_name, connection_dict):
     #docker run -d -p 5432:5432 -e POSTGRESQL_USER=test -e POSTGRESQL_PASS=oe9jaacZLbR9pN -e POSTGRESQL_DB=test orchardup/postgresql
     c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=30)
@@ -31,7 +43,9 @@ def create_postgres_instance(connection_dict):
         "POSTGRES_DB": connection_dict['db_name']
     }
     internal_port = 5432
-    container_info = c.create_container('postgres', ports=[internal_port], environment=environment)
+    if check_container_exists(postgraas_instance_name):
+        raise ValueError('Container exists already')
+    container_info = c.create_container('postgres', name=postgraas_instance_name, ports=[internal_port], environment=environment)
     container_id = container_info['Id']
     port_dict = {internal_port: connection_dict['port']}
     c.start(container_id, port_bindings=port_dict)

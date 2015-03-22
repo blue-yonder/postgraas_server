@@ -108,7 +108,7 @@ class DBInstanceListResource(Resource):
         if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']).first():
             return {'msg': "postgraas_instance_name already exists {}".format(args['postgraas_instance_name']) }
         try:
-            db_credentials['container_id'] = pg.create_postgres_instance(db_credentials)
+            db_credentials['container_id'] = pg.create_postgres_instance(args['postgraas_instance_name'], db_credentials)
         except APIError as e:
             return {'msg': str(e)}
         db_entry = DBInstance(postgraas_instance_name=args['postgraas_instance_name'],
