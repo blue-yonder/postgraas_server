@@ -1,9 +1,13 @@
 ---
 - hosts: all
   sudo: yes
+
+  vars:
+    app_user: postgraas
+
   tasks:
   - name: Install base packages
-    apt: name={{ item }} update_cache=no force=no state=installed
+    apt: name={{ item }} update_cache=yes force=no state=installed
     with_items:
     - build-essential
     - ntp
@@ -24,3 +28,15 @@
 
   - name: install docker with evil internetscript
     shell: curl -sSL https://get.docker.com/ | sh
+
+  - name: add docker group
+    group: name=docker state=present
+
+  - name: add root user to the docker group
+    shell: sudo gpasswd -a {{ ansible_ssh_user }} docker
+
+  - name: create app user in docker group
+    user: name={{ app_user }} shell=/bin/bash groups=docker append=yes
+
+  - name: start docker deamon
+    service: name=docker state=restarted
