@@ -21,7 +21,7 @@ def get_open_port():
         return port
 
 
-def check_container_exists(postgraas_instance_name):
+def get_container_by_name(postgraas_instance_name):
     c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=30)
     containers = c.containers()
@@ -30,7 +30,12 @@ def check_container_exists(postgraas_instance_name):
         print container
         for name in container['Names']:
             if postgraas_instance_name in name.replace("/", ""):
-                return True
+                return container
+
+
+def check_container_exists(postgraas_instance_name):
+    if get_container_by_name(postgraas_instance_name):
+        return True
     return False
 
 def create_postgres_instance(postgraas_instance_name, connection_dict):

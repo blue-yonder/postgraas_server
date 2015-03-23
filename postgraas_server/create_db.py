@@ -16,13 +16,16 @@ def create_db_container():
         db_credentials['container_id'] = pg.create_postgres_instance('postgraas_master_db', db_credentials)
     except ValueError as e:
         print "warning container already exists"
+        postrgaas_db = pg.get_container_by_name('postgraas_master_db')
+        db_credentials['container_id'] = postrgaas_db['Id']
     return db_credentials
 
 
-def main():
+def main(postgraas_app):
     db_credentials = create_db_container()
-    init_db(db_credentials)
+    init_db(db_credentials, postgraas_app)
 
 
 if __name__ == '__main__':
-    main()
+    from postgraas_server import postgraas_api
+    main(postgraas_api.app)
