@@ -41,7 +41,7 @@ class TestPostgraasApi(unittest.TestCase):
             "host": pid.get_hostname(),
             "port": pid.get_open_port()
         }
-        result = pid.create_postgres_instance(db_credentials)
+        result = pid.create_postgres_instance('test_instance_name', db_credentials)
         self.assertEqual(result, 'fy8rfsufusgsufbvluluivhhvsbr')
 
     def test_create_postgres_instance_api(self):
@@ -84,7 +84,7 @@ class TestPostgraasApi(unittest.TestCase):
             "host": pid.get_hostname(),
             "port": pid.get_open_port()
         }
-        self.assertRaises(APIError, pid.create_postgres_instance, db_credentials)
+        self.assertRaises(APIError, pid.create_postgres_instance, 'test_instance_name', db_credentials)
 
     def test_create_postgres_instance_name_exists(self):
         db_credentials = {
