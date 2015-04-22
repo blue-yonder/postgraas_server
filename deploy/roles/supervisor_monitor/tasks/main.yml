@@ -1,0 +1,16 @@
+- name: Check directories
+  file: path={{ item }} state=directory
+  with_items: 
+    - sm_log_dir
+  
+- name: Copy config file
+  template: src={{ sm_app_ini_template }} dest={{ sm_supervisor_config_dir }}/{{ sm_app_name }}.ini
+  notify: reload supervisor job
+
+- name: Register Supervisor job
+  supervisorctl: >
+    state=present
+    name={{ sm_app_name }}
+    supervisorctl_path={{ sm_supervisorctl_path }}
+    config={{ sm_supervisor_config }}
+  notify: reload supervisor job

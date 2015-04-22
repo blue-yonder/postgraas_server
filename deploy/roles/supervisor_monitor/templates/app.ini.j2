@@ -1,0 +1,8 @@
+[program:{{ sm_app_name }}]
+command={{ sm_command }}
+directory={{ sm_app_home }}
+stdout_logfile={{ sm_log_dir }}/supervisor_{{ sm_app_name }}.out.log
+autostart={{ sm_autostart }}
+autorestart=true
+redirect_stderr = true
+logfile_backups = 2

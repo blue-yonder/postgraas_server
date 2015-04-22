@@ -1,0 +1,18 @@
+; For more information on the config file, please see:
+; http://supervisord.org/configuration.html
+
+[unix_http_server]
+file=%(here)s/supervisord.sock
+
+[supervisord]
+logfile=%(here)s/supervisord.log
+pidfile=%(here)s/supervisord.pid
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix://%(here)s/supervisord.sock
+
+[include]
+files = conf.d/*.ini

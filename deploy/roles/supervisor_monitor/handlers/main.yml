@@ -1,0 +1,5 @@
+---
+- name: reload supervisor job
+  shell: >
+    {{ sm_supervisorctl_path }} -c {{ sm_supervisor_config }} reread;
+    {{ sm_supervisorctl_path }} -c {{ sm_supervisor_config }} update {{ sm_app_name}}

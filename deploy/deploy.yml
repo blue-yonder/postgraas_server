@@ -1,0 +1,15 @@
+---
+- hosts: all
+  remote_user: "{{ app_user }}"
+
+  roles:
+    - { role: supervisor_venv }
+    - role: supervisor_monitor
+      sm_app_name: postgraas_server
+      sm_app_home: app_home
+      sm_command: gunicorn
+
+  tasks:
+  - name: check app directory
+    file: path="{{ app_home }}" state=directory
+

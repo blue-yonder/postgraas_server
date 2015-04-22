@@ -1,0 +1,7 @@
+sm_supervisor_config_dir: /etc/supervisor/conf.d
+sm_supervisor_config: /etc/supervisor/supervisord.conf
+sm_supervisorctl_path: /bin/supervisorctl
+
+sm_app_ini_template: app.ini.j2
+sm_autostart: false
+sm_log_dir: '{{ sm_app_home }}/log'

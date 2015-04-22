@@ -38,5 +38,7 @@
   - name: create app user in docker group
     user: name={{ app_user }} shell=/bin/bash groups=docker append=yes
 
+  - authorized_key: user={{ app_user }} key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
   - name: start docker deamon
     service: name=docker state=restarted

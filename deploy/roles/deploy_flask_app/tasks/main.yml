@@ -1,0 +1,5 @@
+- name: installing gunicorn into virtualenv
+  pip:
+    name=gunicorn
+    virtualenv={{ virtualenv }}
+    state=present
