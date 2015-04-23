@@ -1,0 +1,9 @@
+[program:{{ sm_app_name }}]
+command= {{ app_virtualenv|replace("~", "%(ENV_HOME)s") }}/bin/gunicorn -n {{ sm_app_name }} --bind 0.0.0.0:{{app_port}} -w 4 {{ wsgi_app_name }} --log-config gunicorn_logging.conf --timeout 300
+directory={{ sm_app_home }}
+stdout_logfile={{ sm_log_dir }}/supervisor_{{ sm_app_name }}.out.log
+autostart={{ sm_autostart }}
+autorestart=true
+redirect_stderr = true
+logfile_backups = 2
+

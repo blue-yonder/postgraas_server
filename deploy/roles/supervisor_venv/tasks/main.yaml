@@ -1,3 +1,10 @@
+
+- name: installing Distribute (evil hack for vagrantbox) into virtualenv
+  pip:
+    name=Distribute
+    virtualenv={{ sv_virtualenv }}
+    state=latest
+
 - name: installing supervisor into virtualenv
   pip:
     name=supervisor

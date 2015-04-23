@@ -1,2 +1,7 @@
 app_user: postgraas
+app_name: postgraas_server_dev
 app_home: ~/postgraas
+app_port: 10123
+wsgi_app_name: app
+
+app_virtualenv: "{{ app_home }}/venv"

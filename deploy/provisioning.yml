@@ -20,6 +20,11 @@
     - supervisor
     - curl
 
+  - name: installing virtualenv into virtualenv
+    pip:
+      name=virtualenv
+      state=latest
+
   - name: add backports repository
     apt_repository: repo='deb http://http.debian.net/debian wheezy-backports main' state=present
 

@@ -3,11 +3,20 @@
   remote_user: "{{ app_user }}"
 
   roles:
-    - { role: supervisor_venv }
+    - role: deploy_flask_app
+      fa_virtualenv: "{{ app_virtualenv }}"
+
+    - role: supervisor_venv
+      sv_virtualenv: "{{ app_virtualenv }}"
+      sv_http: true
+
     - role: supervisor_monitor
-      sm_app_name: postgraas_server
-      sm_app_home: app_home
-      sm_command: gunicorn
+      sm_supervisor_config_dir: "{{ app_virtualenv }}/etc/supervisor/conf.d"
+      sm_supervisor_config: "{{ app_virtualenv }}/etc/supervisor/supervisord.conf"
+      sm_supervisorctl_path: "{{ app_virtualenv }}/bin/supervisorctl"
+      sm_app_name: "{{ app_name }}"
+      sm_app_home: "{{ app_home }}"
+      sm_app_ini_template: templates/app.ini.j2
 
   tasks:
   - name: check app directory
