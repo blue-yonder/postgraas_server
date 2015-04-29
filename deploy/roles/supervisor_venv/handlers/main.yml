@@ -1,5 +1,0 @@
----
-- name: reload supervisor
-  shell: chdir={{ sv_virtualenv }}/etc/supervisor
-    {{ sv_virtualenv }}/bin/supervisorctl -c {{ sv_virtualenv }}/etc/supervisor/supervisord.conf reread;
-    {{ sv_virtualenv }}/bin/supervisorctl -c {{ sv_virtualenv }}/etc/supervisor/supervisord.conf update

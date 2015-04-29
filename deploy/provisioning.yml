@@ -10,6 +10,8 @@
     apt: name={{ item }} update_cache=yes force=no state=installed
     with_items:
     - build-essential
+    - python-psycopg2
+    - libpq-dev
     - ntp
     - htop
     - git

@@ -3,22 +3,19 @@
   remote_user: "{{ app_user }}"
 
   roles:
-    - role: deploy_flask_app
-      fa_virtualenv: "{{ app_virtualenv }}"
-
-    - role: supervisor_venv
-      sv_virtualenv: "{{ app_virtualenv }}"
-      sv_http: true
-
-    - role: supervisor_monitor
-      sm_supervisor_config_dir: "{{ app_virtualenv }}/etc/supervisor/conf.d"
-      sm_supervisor_config: "{{ app_virtualenv }}/etc/supervisor/supervisord.conf"
-      sm_supervisorctl_path: "{{ app_virtualenv }}/bin/supervisorctl"
-      sm_app_name: "{{ app_name }}"
-      sm_app_home: "{{ app_home }}"
-      sm_app_ini_template: templates/app.ini.j2
+    - role: deploy-app_flask
+      daf_app_package: postgraas_server
+      daf_pip_index_url: "{{ pip_index_url }}"
+      daf_app_name: "{{ app_name }}"
+      daf_app_port: "{{ app_port }}"
+      daf_venv: "{{ app_virtualenv }}"
+      daf_home: "{{ app_home }}"
+      daf_wsgi_app_name: "postgraas_server.postgraas_api:app"
+      da_supervisor_http_port: 9090
+      daf_config_files:
+        - templates/postgraas_server.cfg.j2
 
   tasks:
-  - name: check app directory
-    file: path="{{ app_home }}" state=directory
+  - name: create db
+    shell: "{{ app_virtualenv }}/bin/create_db"
 

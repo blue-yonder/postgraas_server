@@ -1,5 +1,0 @@
-sv_virtualenv: "~/venv"
-
-sv_http: false
-sv_http_host: 0.0.0.0
-sv_http_port: 9001

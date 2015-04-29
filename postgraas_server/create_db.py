@@ -21,11 +21,11 @@ def create_db_container():
     return db_credentials
 
 
-def main(postgraas_app):
+def main():
+    from postgraas_server import postgraas_api
     db_credentials = create_db_container()
-    init_db(db_credentials, postgraas_app)
+    init_db(db_credentials, postgraas_api.app)
 
 
 if __name__ == '__main__':
-    from postgraas_server import postgraas_api
-    main(postgraas_api.app)
+    main()
