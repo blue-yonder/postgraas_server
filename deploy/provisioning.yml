@@ -9,6 +9,7 @@
   - name: Install base packages
     apt: name={{ item }} update_cache=yes force=no state=installed
     with_items:
+    - sudo
     - build-essential
     - python-psycopg2
     - libpq-dev

@@ -12,10 +12,14 @@
       daf_home: "{{ app_home }}"
       daf_wsgi_app_name: "postgraas_server.postgraas_api:app"
       da_supervisor_http_port: 9090
+      daf_supervisor_autostart: true
       daf_config_files:
         - templates/postgraas_server.cfg.j2
 
   tasks:
+  - name: pull image
+    shell: docker pull postgres
+
   - name: create db
     shell: "{{ app_virtualenv }}/bin/create_db"
 

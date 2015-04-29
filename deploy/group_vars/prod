@@ -1,0 +1,7 @@
+app_user: postgraas
+app_name: postgraas_server_dev
+app_home: "{{ ansible_env['HOME'] }}/{{ app_name }}"
+app_port: 10123
+
+pip_index_url: http://software/for_dev/
+app_virtualenv: "{{ app_home }}/venv"

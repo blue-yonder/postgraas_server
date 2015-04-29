@@ -1,0 +1,6 @@
+{
+	"postgraas_instance_name": "my_postgraas",
+	"db_name": "my_db",
+	"db_username": "db_user",
+	"db_pwd": "secret"
+}
