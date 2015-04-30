@@ -60,6 +60,8 @@ class DBInstanceResource(Resource):
     def delete(self, id):
         c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=10)
+        if id == 1:
+            return {'status': 'failed', 'msg': 'No one deletes postgraas instance #1 !!!'.format(id)}
         entity = DBInstance.query.get(id)
         if entity:
             try:
