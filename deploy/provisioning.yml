@@ -49,4 +49,4 @@
   - authorized_key: user={{ app_user }} key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
   - name: start docker deamon
-    service: name=docker state=restarted
+    service: name=docker state=started

@@ -1,6 +1,6 @@
 {
-	"postgraas_instance_name": "my_postgraas",
-	"db_name": "my_db",
-	"db_username": "db_user",
-	"db_pwd": "secret"
+	"postgraas_instance_name": "sebi_postgraas_test",
+	"db_name": "my_next_project_spark_on_steroids",
+	"db_username": "stratosphere_client",
+	"db_pwd": "secret_password_in_git_forever"
 }

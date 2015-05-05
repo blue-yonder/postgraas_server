@@ -1,6 +1,6 @@
 __author__ = 'sebastianneubauer'
 
-DB_PATH = 'postgresql://postgraas:postgraas12@localhost/postgraas'
+
 
 def init_db(db_credentials, postgraas_app):
     # import all modules here that might define models so that

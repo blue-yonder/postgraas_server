@@ -1,0 +1,13 @@
+---
+- hosts: all
+  remote_user: "{{ app_user }}"
+
+  vars:
+    devel_folder: "{{ ansible_env['HOME'] }}/developing"
+
+  tasks:
+  - name: create_folder
+    file: dest="{{ devel_folder }}" state=directory
+
+  - name: copy template
+    template: src=templates/postgraas_server.cfg.j2 dest="{{ devel_folder }}/postgraas_server.cfg"

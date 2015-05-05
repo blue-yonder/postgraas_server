@@ -27,7 +27,7 @@ def get_container_by_name(postgraas_instance_name):
     containers = c.containers()
     print postgraas_instance_name
     for container in containers:
-        print container
+        #print container
         for name in container['Names']:
             if postgraas_instance_name in name.replace("/", ""):
                 return container

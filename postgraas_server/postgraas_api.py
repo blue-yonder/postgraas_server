@@ -6,13 +6,13 @@ from flask.ext.restful import fields, Resource, marshal_with, Api, reqparse
 import postgraas_server.management_database as database
 from postgraas_server.management_resources import db
 from postgraas_server.management_resources import DBInstanceResource, DBInstanceListResource
-
+from postgraas_server.configuration import get_meta_db_config_path
 
 logger = logging.getLogger(__name__)
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = database.DB_PATH
+app.config['SQLALCHEMY_DATABASE_URI'] = get_meta_db_config_path()
 
 
 restful_api = Api(app)
