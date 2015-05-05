@@ -50,12 +50,10 @@ def config_logging():
 def get_meta_db_config_path():
     config = get_config()
     DB_PATH = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
-        {
-            "db_name": config.get('metadb', 'db_name'),
-            "db_username": config.get('metadb', 'db_username'),
-            "db_pwd": config.get('metadb', 'db_pwd'),
-            "host": config.get('metadb', 'host'),
-            "port": config.get('metadb', 'port')
-        }
+        db_name=config.get('metadb', 'db_name'),
+        db_username=config.get('metadb', 'db_username'),
+        db_pwd=config.get('metadb', 'db_pwd'),
+        host=config.get('metadb', 'host'),
+        port=config.get('metadb', 'port')
     )
     return DB_PATH

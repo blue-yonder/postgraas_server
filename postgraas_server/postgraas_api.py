@@ -16,8 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = get_meta_db_config_path()
 
 
 restful_api = Api(app)
-restful_api.add_resource(DBInstanceResource,        "/api/v2/postgraas_instances/<int:id>")
-restful_api.add_resource(DBInstanceListResource,    "/api/v2/postgraas_instances")
+restful_api.add_resource(DBInstanceResource, "/api/v2/postgraas_instances/<int:id>")
+restful_api.add_resource(DBInstanceListResource, "/api/v2/postgraas_instances")
 db.init_app(app)
 
 if __name__ == "__main__":
