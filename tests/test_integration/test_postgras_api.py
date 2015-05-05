@@ -13,7 +13,7 @@ class TestPostgraasApi(unittest.TestCase):
 
     def get_postgraas_by_name(self, name):
         headers = {'Content-Type': 'application/json'}
-        list = self.app.get('/api/v1/postgraas_instances', headers=headers)
+        list = self.app.get('/api/v2/postgraas_instances', headers=headers)
         #print list.data
         for instance in json.loads(list.data):
             #print instance
@@ -23,7 +23,7 @@ class TestPostgraasApi(unittest.TestCase):
     def delete_instance_by_name(self, db_credentials):
         id = self.get_postgraas_by_name(db_credentials["postgraas_instance_name"])
         print id
-        print self.app.delete('/api/v1/postgraas_instances/' + str(id))
+        print self.app.delete('/api/v2/postgraas_instances/' + str(id))
 
     def setUp(self):
         papi.app.config['TESTING'] = True
@@ -53,7 +53,7 @@ class TestPostgraasApi(unittest.TestCase):
         }
         self.delete_instance_by_name(db_credentials)
         headers = {'Content-Type': 'application/json'}
-        result = self.app.post('/api/v1/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         created_db = json.loads(result.data)
         self.assertEqual(created_db["db_name"], 'test_create_postgres_instance')
         self.delete_instance_by_name(db_credentials)
@@ -67,10 +67,10 @@ class TestPostgraasApi(unittest.TestCase):
         }
         self.delete_instance_by_name(db_credentials)
         headers = {'Content-Type': 'application/json'}
-        result = self.app.post('/api/v1/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         created_db = json.loads(result.data)
         print created_db
-        delete_result = self.app.delete('/api/v1/postgraas_instances/' + str(created_db["postgraas_instance_id"]))
+        delete_result = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]))
         deleted_db = json.loads(delete_result.data)
         self.assertEqual(deleted_db["status"], 'success')
         self.delete_instance_by_name(db_credentials)
@@ -95,8 +95,8 @@ class TestPostgraasApi(unittest.TestCase):
         }
         self.delete_instance_by_name(db_credentials)
         headers = {'Content-Type': 'application/json'}
-        first = self.app.post('/api/v1/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
-        second = self.app.post('/api/v1/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        first = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        second = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         print second.data
         self.assertEqual(second.data, json.dumps({"msg": "postgraas_instance_name already exists my_postgraas_twice"}))
         self.delete_instance_by_name(db_credentials)
