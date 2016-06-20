@@ -3,6 +3,7 @@
 *.py[cod]
 *.so
 *.cfg
+!setup.cfg
 *.orig
 *.log
 *.pot
@@ -19,6 +20,7 @@ __pycache__/*
 
 # Package files
 *.egg
+*.eggs/
 .installed.cfg
 *.egg-info
 
@@ -33,7 +35,7 @@ coverage.xml
 build/*
 dist/*
 sdist/*
-docs/_rst/*
+docs/api/*
 docs/_build/*
 cover/*
 MANIFEST

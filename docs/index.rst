@@ -12,8 +12,9 @@ This is the documentation of **postgraas_server**.
     rst-files in ``docs`` and adding them to the `toctree
     <http://sphinx-doc.org/markup/toctree.html>`_ below. Use then
     `references <http://sphinx-doc.org/markup/inline.html>`__ in order to link
-    them from this page. It is also possible to refer to the documentation of
-    other Python packages with the `Python domain syntax
+    them from this page, e.g. :ref:`authors <authors>` and :ref:`changes`.
+    It is also possible to refer to the documentation of other Python packages
+    with the `Python domain syntax
     <http://sphinx-doc.org/domains.html#the-python-domain>`__. By default you
     can reference the documentation of `Sphinx <http://sphinx.pocoo.org>`__,
     `Python <http://docs.python.org/>`__, `matplotlib
@@ -29,8 +30,11 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   
-   Module Reference <_rst/modules>
+
+   License <license>
+   Authors <authors>
+   Changelog <changes>
+   Module Reference <api/modules>
 
 
 Indices and tables

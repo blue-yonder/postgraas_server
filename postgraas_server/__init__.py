@@ -1,4 +1,6 @@
-from ._version import get_versions
+import pkg_resources
 
-__version__ = get_versions()['version']
-del get_versions
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except:
+    __version__ = 'unknown'

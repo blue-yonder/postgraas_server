@@ -2,4 +2,4 @@
 Developers
 ==========
 
-* sebastianneubauer <sebineubauer@gmail.com>
+* Sebastian Neubauer <sebineubauer@gmail.com>
