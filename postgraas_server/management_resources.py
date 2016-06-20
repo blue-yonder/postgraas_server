@@ -9,7 +9,7 @@ import postgres_instance_driver as pg
 logger = logging.getLogger(__name__)
 
 
-db =SQLAlchemy()
+db = SQLAlchemy()
 
 
 class DBInstance(db.Model):
@@ -60,8 +60,6 @@ class DBInstanceResource(Resource):
     def delete(self, id):
         c = docker.Client(base_url='unix://var/run/docker.sock',
                   timeout=10)
-        if id == 1:
-            return {'status': 'failed', 'msg': 'No one deletes postgraas instance #1 !!!'.format(id)}
         entity = DBInstance.query.get(id)
         if entity:
             try:
@@ -69,7 +67,7 @@ class DBInstanceResource(Resource):
                 print container_info
             except APIError as e:
                 if e.response.status_code == 404:
-                    logger.warning("conatiner {} doe not exist, how cold that happen?".format(entity.container_id))
+                    logger.warning("conatiner {} doe not exist, how could that happen?".format(entity.container_id))
                     db.session.delete(entity)
                     db.session.commit()
                     return {'status': 'sucess', 'msg': 'deleted postgraas instance, but container was not found...'}
