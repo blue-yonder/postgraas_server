@@ -114,11 +114,10 @@ class DBInstanceListResource(Resource):
         db_entry = DBInstance(postgraas_instance_name=args['postgraas_instance_name'],
                               db_name=args['db_name'],
                               username=args['db_username'],
-                              password=args['db_pwd'],
+                              password="",
                               hostname=db_credentials['host'],
                               port=db_credentials['port'],
                               container_id=db_credentials['container_id'])
-        print db_entry
         db.session.add(db_entry)
         db.session.commit()
         db_credentials["postgraas_instance_id"] = db_entry.id

@@ -8,17 +8,19 @@ def get_unique_id(connection_dict):
 
 
 def get_hostname():
-    return "weather-test1"
+    #mmmh, how should this be done? need nome kind ouf routing...
+    return "not imlemented yet"
 
 
 def get_open_port():
-        import socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(("",0))
-        s.listen(1)
-        port = s.getsockname()[1]
-        s.close()
-        return port
+    #this should be done somewhere else, e.g docker itself, but for now...
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("",0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return port
 
 
 def get_container_by_name(postgraas_instance_name):

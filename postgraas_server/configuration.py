@@ -23,9 +23,10 @@ def get_config_filename():
     return config_filename
 
 
-def get_config():
+def get_config(config_filename=None):
     config = ConfigParser.RawConfigParser()
-    config_filename = get_config_filename()
+    if not config_filename:
+        config_filename = get_config_filename()
     logger.debug('config filename: {}'.format(config_filename))
     config.read(config_filename)
     expand_env_vars(config)
@@ -47,8 +48,7 @@ def config_logging():
         logger.warning('logging config file does not exist {}'.format(file_name))
 
 
-def get_meta_db_config_path():
-    config = get_config()
+def get_meta_db_config_path(config):
     DB_PATH = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
         db_name=config.get('metadb', 'db_name'),
         db_username=config.get('metadb', 'db_username'),
