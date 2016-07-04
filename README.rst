@@ -2,6 +2,10 @@
 postgraas_server
 ================
 
+.. image:: https://travis-ci.org/blue-yonder/postgraas_server.svg?branch=master
+    :target: https://travis-ci.org/blue-yonder/postgraas_server
+
+
 
 Add a short description here!
 
