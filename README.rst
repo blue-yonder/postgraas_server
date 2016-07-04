@@ -5,7 +5,10 @@ postgraas_server
 .. image:: https://travis-ci.org/blue-yonder/postgraas_server.svg?branch=master
     :target: https://travis-ci.org/blue-yonder/postgraas_server
 
-.. image:: https://coveralls.io/repos/github/blue-yonder/postgraas_server/badge.svg?branch=master :target: https://coveralls.io/github/blue-yonder/postgraas_server?branch=master 
+
+.. image:: https://coveralls.io/repos/github/blue-yonder/postgraas_server/badge.svg?branch=master
+    :target: https://coveralls.io/github/blue-yonder/postgraas_server?branch=master
+
 
 Add a short description here!
 
