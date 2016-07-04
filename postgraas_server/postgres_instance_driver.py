@@ -43,7 +43,8 @@ def check_container_exists(postgraas_instance_name):
 def create_postgres_instance(postgraas_instance_name, connection_dict):
     #docker run -d -p 5432:5432 -e POSTGRESQL_USER=test -e POSTGRESQL_PASS=oe9jaacZLbR9pN -e POSTGRESQL_DB=test orchardup/postgresql
     c = docker.Client(base_url='unix://var/run/docker.sock',
-                  timeout=30)
+                        timeout=30,
+                        version='auto')
     environment = {
         "POSTGRES_USER": connection_dict['db_username'],
         "POSTGRES_PASS": connection_dict['db_pwd'],
@@ -62,6 +63,7 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
 
 def delete_postgres_instance(container_id):
     c = docker.Client(base_url='unix://var/run/docker.sock',
-                  timeout=30)
+                        timeout=30,
+                        version='auto')
     print c.remove_container(container_id, force=True)
     return True
