@@ -2,9 +2,14 @@
 Changelog
 =========
 
-Version 0.1
-===========
+v0.1.3
+======
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+- Introduced completely new API v2
+
+v0.1.0
+======
+
+- First running version
+
+
