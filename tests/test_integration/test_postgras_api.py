@@ -24,7 +24,8 @@ class TestPostgraasApi(unittest.TestCase):
 
     def delete_all_test_postgraas_container(self):
         c = docker.Client(base_url='unix://var/run/docker.sock',
-                  timeout=30)
+                            timeout=30,
+                            version='auto')
         containers = c.containers()
         for container in containers:
             for name in container['Names']:

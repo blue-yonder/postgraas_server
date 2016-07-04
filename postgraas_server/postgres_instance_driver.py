@@ -25,7 +25,8 @@ def get_open_port():
 
 def get_container_by_name(postgraas_instance_name):
     c = docker.Client(base_url='unix://var/run/docker.sock',
-                  timeout=30)
+                        version='auto',
+                        timeout=30)
     containers = c.containers()
     print postgraas_instance_name
     for container in containers:
