@@ -5,6 +5,10 @@ python:
 services:
   - docker
 
+
+before_install:
+- docker pull postgres
+
 # command to install dependencies
 install:
  - "pip install -r requirements.txt"
