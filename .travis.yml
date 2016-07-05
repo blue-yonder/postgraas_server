@@ -1,22 +1,23 @@
 language: python
 python:
-  - "2.7"
-
+- '2.7'
 services:
-  - docker
-
-
+- docker
 before_install:
 - docker pull postgres
-
-# command to install dependencies
 install:
- - "pip install -r requirements.txt"
- - "pip install -r requirements_dev.txt"
- - "pip install -e ."
- - "pip install coveralls"
-# command to run tests
+- pip install -r requirements.txt
+- pip install -r requirements_dev.txt
+- pip install -e .
+- pip install coveralls
 script: py.test
-
 after_success:
-  - coveralls
+- coveralls
+deploy:
+  provider: pypi
+  user: sebastianneubauer
+  password:
+    secure: AwbSrSt2gVm8FhXKMOdtmwifnNwjUbuLeJdpMnIXMLkpzEAMAoJPPkn4+hsvaC9HpKZKl/CMo94ZZ+39lQ1n8C+7LvhcvR6QEBnSS44PuTZb7cb//WEexHpJx2uqP36GA7OAcyQ1fLQ10sMU1xqxFWvHrboafqHt9i5U30HpWwSwZK8EsEHfAzJGyCaRxqgyuUZUNPhzN6JFfmrIuHWXEl85z7TiTrnBT7tsSFj242qO/XNrq7PzhLRxV+e6HXIDTlCBY3TVg7FcDacIAZOWnJn8ixW/uZz2Cg9Etjl1E5PauCAo/mOzNSp4MoL+EsTlhY6eIOYOBt1nrd1UkZeWZzVvVsSMwgkN5erJ/Gd/e63UlcFB0Gr5g4s+Gl/yLTZpLSL+643Adn67IK/JkkynkvMvePVDpIxgSaAzQYllCYrVi7Hy7OugYeH907cOhGzjChi3uHQR+tWxT26fL6+CQCeVW5O5sqm08HUYBbDit8BRdjhu4keG8p4xoJ4GH3Nffo4+IDU2ANpoxVgJf5+o9TACpKR6yTYI2Jq02d+CBvJbqmNTtC6wpSDianviHDxNNipbJJtIbtCgS3ERtmxsPUBWvYaFAEYncNwYC/h7b59VUjXGgzx/E55j0T61xfn2EQvFSo7Y+z0MNMmFBEzAp86GFPkWUNRywuuPxeHFQFY=
+  on:
+    tags: true
+    branch: master
