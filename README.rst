@@ -10,18 +10,19 @@ postgraas_server
     :target: https://coveralls.io/github/blue-yonder/postgraas_server?branch=master
 
 
-Postgraas is a super simple PostgereSQL-as-a-service
+Postgraas is a super simple PostgreSQL-as-a-service
 
 
-Description
-===========
+What is Postgraas?
+==================
 
-Postgraas offers CRUD operations for complete PostgreSQL database instances via a simple REST api. The database instances are docker containers and the api server is a few hundred LoC Flask application. It is of not meant as a production ready solution, but more a proof-of-concept to spread the idea of creating "as-a-service" services easily yourself and should inspire you to start working on your own cloud infrastructure today. But in fact, it proofs the concept very well and it turned out to be super useful for delivering a PostgreSQL instance if you need one fast: for integration tests, for playing around with fancy ShowHN projects or other experiments. The CRUD operations via REST api is of course also a necessary prequisite for building an automated continuous delivery pipeline for your quality project. 
+Postgraas offers `CRUD <https://de.wikipedia.org/wiki/CRUD>`_ operations for complete PostgreSQL database instances via a simple REST api. The database instances are docker containers and the api server is a few hundred LoC Flask application. It is of not meant as a production ready solution, but more a proof-of-concept to spread the idea of creating "as-a-service" services easily yourself and should inspire you to start working on your own cloud infrastructure today. But in fact, it proofs the concept very well and it turned out to be super useful for delivering a PostgreSQL instance if you need one fast: for integration tests, for playing around with fancy ShowHN projects or other experiments. The CRUD operations via REST api is of course also a necessary prequisite for building an automated continuous delivery pipeline for your quality project. 
 
 
 
-Note
-====
+Usage
+=====
 
-This project has been set up using PyScaffold 2.5.6. For details and usage
-information on PyScaffold see http://pyscaffold.readthedocs.org/.
+
+
+
