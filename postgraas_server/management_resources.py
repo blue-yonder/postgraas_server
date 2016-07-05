@@ -1,7 +1,7 @@
 __author__ = 'sebastianneubauer'
 import datetime
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.restful import fields, Resource, marshal_with, Api, reqparse
+from flask_sqlalchemy import SQLAlchemy
+from flask_restful import fields, Resource, marshal_with, Api, reqparse
 from docker.errors import APIError
 import logging
 import docker
