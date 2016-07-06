@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v0.1.6
+======
+
+- bugfix: password was not set in instance
+
 v0.1.5
 ======
 
