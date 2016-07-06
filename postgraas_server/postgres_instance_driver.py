@@ -48,7 +48,7 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
                         version='auto')
     environment = {
         "POSTGRES_USER": connection_dict['db_username'],
-        "POSTGRES_PASS": connection_dict['db_pwd'],
+        "POSTGRES_PASSWORD": connection_dict['db_pwd'],
         "POSTGRES_DB": connection_dict['db_name']
     }
     internal_port = 5432
