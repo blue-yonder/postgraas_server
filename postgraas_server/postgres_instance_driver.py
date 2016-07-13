@@ -28,9 +28,7 @@ def get_container_by_name(postgraas_instance_name):
                         version='auto',
                         timeout=30)
     containers = c.containers()
-    print postgraas_instance_name
     for container in containers:
-        #print container
         for name in container['Names']:
             if postgraas_instance_name in name.replace("/", ""):
                 return container
@@ -41,8 +39,8 @@ def check_container_exists(postgraas_instance_name):
         return True
     return False
 
+
 def create_postgres_instance(postgraas_instance_name, connection_dict):
-    #docker run -d -p 5432:5432 -e POSTGRESQL_USER=test -e POSTGRESQL_PASS=oe9jaacZLbR9pN -e POSTGRESQL_DB=test orchardup/postgresql
     c = docker.Client(base_url='unix://var/run/docker.sock',
                         timeout=30,
                         version='auto')
@@ -55,7 +53,11 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
     if check_container_exists(postgraas_instance_name):
         raise ValueError('Container exists already')
     image = 'postgres'
-    container_info = c.create_container(image, name=postgraas_instance_name, ports=[internal_port], environment=environment, labels={"postgraas": image})
+    container_info = c.create_container(image,
+                                        name=postgraas_instance_name,
+                                        ports=[internal_port],
+                                        environment=environment,
+                                        labels={"postgraas": image})
     container_id = container_info['Id']
     port_dict = {internal_port: connection_dict['port']}
     c.start(container_id, port_bindings=port_dict)
@@ -66,5 +68,5 @@ def delete_postgres_instance(container_id):
     c = docker.Client(base_url='unix://var/run/docker.sock',
                         timeout=30,
                         version='auto')
-    print c.remove_container(container_id, force=True)
-    return True
+    c.remove_container(container_id, force=True)
+    return
