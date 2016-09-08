@@ -5,8 +5,8 @@ Changelog
 v0.1.7
 ======
 
- - fixed docker version 1.12
- 
+- fixed docker version 1.12
+
 v0.1.6
 ======
 
