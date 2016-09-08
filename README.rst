@@ -20,13 +20,13 @@ Postgraas offers `CRUD <https://de.wikipedia.org/wiki/CRUD>`_ operations for com
 
 Installation
 ============
-You can find detailed instrutions in the `docs <http://postgraas-server.readthedocs.io/en/latest/installation.html>`_
+You can find detailed instructions in the `docs <http://postgraas-server.readthedocs.io/en/latest/installation.html>`_
 
 Install via pip::
 
     pip install postgraas_server
     
-And start the wsgi api server::
+And start the wsgi api server for example with gunicorn::
 
     gunicorn -w 4 -b 0.0.0.0:8080 postgraas_server.postgraas_api:app
     
