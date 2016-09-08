@@ -76,6 +76,7 @@ class TestPostgraasApi(unittest.TestCase):
         headers = {'Content-Type': 'application/json'}
         result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         created_db = json.loads(result.data)
+        print created_db
         self.assertEqual(created_db["db_name"], 'test_create_postgres_instance')
         self.delete_instance_by_name(db_credentials)
 
