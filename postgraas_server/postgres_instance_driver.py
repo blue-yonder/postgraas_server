@@ -53,14 +53,16 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
     if check_container_exists(postgraas_instance_name):
         raise ValueError('Container exists already')
     image = 'postgres'
+    port_bindings = {internal_port: connection_dict['port']}
+    host_config_dict = cli.create_host_config(port_bindings=port_bindings)
     container_info = c.create_container(image,
                                         name=postgraas_instance_name,
                                         ports=[internal_port],
                                         environment=environment,
-                                        labels={"postgraas": image})
+                                        labels={"postgraas": image},
+                                        host_config=host_config_dict)
     container_id = container_info['Id']
-    port_dict = {internal_port: connection_dict['port']}
-    c.start(container_id, port_bindings=port_dict)
+    c.start(container_id)
     return container_id
 
 
