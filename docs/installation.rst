@@ -7,7 +7,7 @@ Prequisites
 
 * Tested on Debian/Ubuntu
 * Python tested with 2.7
-* Docker Engine >= 1.6.0
+* Docker Engine >= 1.12.0
 * Any wsgi server, tested with gunicorn
 * recent pip & setuptools
 
