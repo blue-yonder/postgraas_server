@@ -1,6 +1,8 @@
 __author__ = 'sebastian neubauer'
 import docker
 import hashlib
+import psycopg2
+import time
 
 
 def get_unique_id(connection_dict):
@@ -72,3 +74,12 @@ def delete_postgres_instance(container_id):
                         version='auto')
     c.remove_container(container_id, force=True)
     return
+
+
+def wait_for_postgres(dbname, user, password, host, port):
+    for i in range(540):
+        try:
+            conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+        except psycopg2.OperationalError as e:
+            print i, " ..waiting for db"
+            time.sleep(1)
