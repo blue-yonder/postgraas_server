@@ -2,6 +2,7 @@ from postgraas_server.management_database import init_db
 import postgres_instance_driver as pg
 from postgraas_server.configuration import get_config
 
+
 def create_db_container():
     config = get_config()
     db_credentials = {
@@ -15,8 +16,8 @@ def create_db_container():
         db_credentials['container_id'] = pg.create_postgres_instance('postgraas_master_db', db_credentials)
     except ValueError as e:
         print "warning container already exists"
-        postrgaas_db = pg.get_container_by_name('postgraas_master_db')
-        db_credentials['container_id'] = postrgaas_db['Id']
+        postgraas_db = pg.get_container_by_name('postgraas_master_db')
+        db_credentials['container_id'] = postgraas_db['Id']
     return db_credentials
 
 

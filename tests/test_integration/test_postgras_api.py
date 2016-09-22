@@ -121,6 +121,35 @@ class TestPostgraasApi(unittest.TestCase):
         self.assertEqual(second.data, json.dumps({"msg": "postgraas_instance_name already exists tests_postgraas_my_postgraas_twice"})+"\n")
         self.delete_instance_by_name(db_credentials)
 
+    def test_return_postgres_instance_api(self):
+        db_credentials = {
+            u"postgraas_instance_name": u"tests_postgraas_test_return_postgres_instance_api",
+            u"db_name": u"test_return_postgres_instance",
+            u"db_username": u"db_user",
+            u"db_pwd": u"secret"
+        }
+        self.delete_instance_by_name(db_credentials)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        created_db = json.loads(result.data)
+        created_db_id = created_db['postgraas_instance_id']
+        actual = self.app.get('api/v2/postgraas_instances/{}'.format(created_db_id), headers=headers)
+        self.assertEqual(actual.status_code, 200)
+        actual_data = json.loads(actual.data)
+        actual_data.pop('container_id')
+        actual_data.pop('port')
+        actual_data.pop('creation_timestamp')
+        expected = {
+            u'postgraas_instance_name': u'tests_postgraas_test_return_postgres_instance_api',
+            u'db_name': u'test_return_postgres_instance',
+            u'username': u'db_user',
+            u'password': u'',
+            u'hostname': u'not imlemented yet',
+            u'id': created_db_id,
+        }
+        self.assertDictEqual(actual_data, expected)
+
+        self.delete_instance_by_name(db_credentials)
 
 
 if __name__ == '__main__':

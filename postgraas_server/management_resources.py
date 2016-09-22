@@ -68,21 +68,20 @@ class DBInstanceResource(Resource):
                 print container_info
             except APIError as e:
                 if e.response.status_code == 404:
-                    logger.warning("conatiner {} doe not exist, how could that happen?".format(entity.container_id))
+                    logger.warning("container {} does not exist, how could that happen?".format(entity.container_id))
                     db.session.delete(entity)
                     db.session.commit()
                     return {'status': 'sucess', 'msg': 'deleted postgraas instance, but container was not found...'}
             try:
                 pg.delete_postgres_instance(entity.container_id)
             except APIError as e:
-                logger.warning("error deleting conatiner {}: {}".format(entity.container_id, str(e)))
+                logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
                 return {'status': 'failed', 'msg': str(e)}
             db.session.delete(entity)
             db.session.commit()
             return {'status': 'success', 'msg': 'deleted postgraas instance'}
         else:
             return {'status': 'failed', 'msg': 'Postgraas instance does not exist {}'.format(id)}
-
 
 
 class DBInstanceCollectionResource(Resource):
