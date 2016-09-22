@@ -1,6 +1,8 @@
 __author__ = 'sebastian neubauer'
 import docker
 import hashlib
+import psycopg2
+import time
 
 
 def get_unique_id(connection_dict):
@@ -54,7 +56,8 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
         raise ValueError('Container exists already')
     image = 'postgres'
     port_bindings = {internal_port: connection_dict['port']}
-    host_config_dict = c.create_host_config(port_bindings=port_bindings)
+    restart_policy = {"Name": "unless-stopped"}
+    host_config_dict = c.create_host_config(port_bindings=port_bindings, restart_policy=restart_policy)
     container_info = c.create_container(image,
                                         name=postgraas_instance_name,
                                         ports=[internal_port],
@@ -72,3 +75,12 @@ def delete_postgres_instance(container_id):
                         version='auto')
     c.remove_container(container_id, force=True)
     return
+
+
+def wait_for_postgres(dbname, user, password, host, port):
+    for i in range(540):
+        try:
+            conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+        except psycopg2.OperationalError as e:
+            print i, " ..waiting for db"
+            time.sleep(1)

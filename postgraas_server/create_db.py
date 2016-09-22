@@ -23,7 +23,11 @@ def create_db_container():
 
 def main():
     from postgraas_server import postgraas_api
+    print "creating container for the management db"
     db_credentials = create_db_container()
+    pg.wait_for_postgres(db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],
+                          db_credentials['host'], db_credentials['port'])
+    print "initializing db"
     init_db(db_credentials, postgraas_api.app)
 
 
