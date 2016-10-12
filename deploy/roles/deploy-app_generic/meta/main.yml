@@ -1,0 +1,14 @@
+---
+dependencies:
+  - role: supervisor_monitor
+    sm_app_name: "{{ da_app_name }}"
+    sm_app_home: "{{ da_app_home }}"
+    sm_venv: "{{ da_venv }}"
+    sm_log_dir: "{{ da_app_home }}/log"
+    sm_app_ini: "{{ da_supervisor_app_ini }}"
+    sm_command: "{{ da_supervisor_command }}"
+    sm_autostart: "{{ da_supervisor_autostart }}"
+
+    sm_pip_index_url: "{{ da_pip_index_url }}"
+    sm_supervisor_http: "{{ da_supervisor_http }}"
+    sm_supervisor_http_port: "{{ da_supervisor_http_port }}"

@@ -1,0 +1,14 @@
+da_app_package: null
+da_app_name: null
+da_app_home: "{{ ansible_env['HOME'] }}/{{ da_app_name }}"
+da_venv: "{{ da_app_home }}/venv"
+da_pip_index_url:  http://software/for_dev/
+da_pip_extra_args: --pre --upgrade
+da_dependencies: []
+da_config_files: []
+
+da_supervisor_app_ini: app.ini.j2
+da_supervisor_command: null
+da_supervisor_autostart: false
+da_supervisor_http: true
+da_supervisor_http_port: 9001

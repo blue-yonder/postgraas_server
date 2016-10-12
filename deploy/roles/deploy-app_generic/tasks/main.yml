@@ -1,0 +1,53 @@
+---
+- name: Ensure app_home directory exists
+  file: dest={{ da_app_home }} state=directory
+
+- name: Install dependencies into virtualenv
+  pip: >
+    name={{ item.package }}
+    version={{ item.version | default(omit) }}
+    virtualenv={{ da_venv }}
+    state=present
+    extra_args='-i {{ da_pip_index_url }}Debian_7/'
+  with_items: 
+    - "{{ da_dependencies }}"
+  when: ansible_distribution == 'Debian'
+  notify: restart supervisor job
+
+- name: Install dependencies into virtualenv
+  pip: >
+    name={{ item.package }}
+    version={{ item.version | default(omit) }}
+    virtualenv={{ da_venv }}
+    state=present
+    extra_args='-i {{ da_pip_index_url }}Ubuntu_12.04/'
+  with_items: 
+    - "{{ da_dependencies }}"
+  when: ansible_distribution == 'Ubuntu'
+  notify: restart supervisor job
+
+- name: Install app into virtualenv
+  pip: >
+    name="{{ da_app_package }}"
+    version="{{ da_app_version | default(omit) }}"
+    virtualenv={{ da_venv }}
+    state=present
+    extra_args='-i {{ da_pip_index_url }}Debian_7/ {{ da_pip_extra_args }}'
+  when: ansible_distribution == 'Debian'
+  notify: restart supervisor job
+
+- name: Install app into virtualenv
+  pip: >
+    name="{{ fa_app_package }}"
+    version="{{ da_app_version | default(omit) }}"
+    virtualenv={{ da_venv }}
+    state=present
+    extra_args='-i {{ da_pip_index_url }}Ubuntu_12.04/ {{ da_pip_extra_args }}'
+  when: ansible_distribution == 'Ubuntu'
+  notify: restart supervisor job
+
+- name: Install app config files
+  template: src={{ item }} dest="{{ da_app_home }}/{{ item | basename | regex_replace('^(.*)\\.j2$', '\\1') }}"
+  with_items:
+    - "{{ da_config_files }}"
+  notify: restart supervisor job
