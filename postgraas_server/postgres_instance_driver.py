@@ -54,7 +54,7 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
     internal_port = 5432
     if check_container_exists(postgraas_instance_name):
         raise ValueError('Container exists already')
-    image = 'postgres'
+    image = 'postgres:9.4'
     port_bindings = {internal_port: connection_dict['port']}
     restart_policy = {"Name": "unless-stopped"}
     host_config_dict = c.create_host_config(port_bindings=port_bindings, restart_policy=restart_policy)

@@ -2,6 +2,12 @@
 Changelog
 =========
 
+v0.1.8
+======
+
+- added init script
+- fixed postgraas to 9.4
+
 v0.1.7
 ======
 
