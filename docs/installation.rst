@@ -15,9 +15,9 @@ Install via pip::
 
     pip install postgraas_server
 
-Pull the official postgres docker `image <https://hub.docker.com/_/postgres/>`_::
+Pull the official postgres 9.4 docker `image <https://hub.docker.com/_/postgres/>`_ ::
 
-    docker pull postgres
+    docker pull postgres:9.4
 
 We need a postgres for the service to persist the information about the created instances
 and where do we get one? Yes, we create a docker postgres instance just like all other instances.
