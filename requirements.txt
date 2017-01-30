@@ -2,4 +2,4 @@ flask
 flask-restful
 flask-sqlalchemy
 psycopg2
-docker-py<1.9
+docker~=2.0

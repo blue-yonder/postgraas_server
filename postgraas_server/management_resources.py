@@ -6,6 +6,7 @@ from docker.errors import APIError
 import logging
 import docker
 import postgres_instance_driver as pg
+import psycopg2
 logger = logging.getLogger(__name__)
 
 
@@ -58,30 +59,39 @@ class DBInstanceResource(Resource):
         return entity
 
     def delete(self, id):
-        c = docker.Client(base_url='unix://var/run/docker.sock',
-                            version='auto',
-                            timeout=10)
+        parser = reqparse.RequestParser()
+        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
+        args = parser.parse_args()
+
         entity = DBInstance.query.get(id)
-        if entity:
-            try:
-                container_info = c.inspect_container(entity.container_id)
-                print container_info
-            except APIError as e:
-                if e.response.status_code == 404:
-                    logger.warning("container {} does not exist, how could that happen?".format(entity.container_id))
-                    db.session.delete(entity)
-                    db.session.commit()
-                    return {'status': 'sucess', 'msg': 'deleted postgraas instance, but container was not found...'}
-            try:
-                pg.delete_postgres_instance(entity.container_id)
-            except APIError as e:
-                logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
-                return {'status': 'failed', 'msg': str(e)}
+        if not entity:
+            return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}
+
+        connection_error = None
+        try:
+            conn = psycopg2.connect(user=entity.username, password=args['db_pwd'],
+                                    host='127.0.0.1', port=entity.port, dbname=entity.db_name)
+            conn.close()
+        except StandardError as ex:
+            connection_error = str(ex)
+
+        if connection_error is not None:
+            return {'status': 'failed', 'msg': 'Could not connect to postgres instance: {}'.format(connection_error)}
+
+        if not pg.check_container_exists(entity.container_id):
+            logger.warning("container {} does not exist, how could that happen?".format(entity.container_id))
             db.session.delete(entity)
             db.session.commit()
-            return {'status': 'success', 'msg': 'deleted postgraas instance'}
-        else:
-            return {'status': 'failed', 'msg': 'Postgraas instance does not exist {}'.format(id)}
+            return {'status': 'success', 'msg': 'deleted postgraas instance, but container was not found...'}
+
+        try:
+            pg.delete_postgres_instance(entity.container_id)
+        except APIError as e:
+            logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
+            return {'status': 'failed', 'msg': str(e)}
+        db.session.delete(entity)
+        db.session.commit()
+        return {'status': 'success', 'msg': 'deleted postgraas instance'}
 
 
 class DBInstanceCollectionResource(Resource):

@@ -12,12 +12,12 @@ def create_db_container():
             "host": config.get('metadb', 'host'),
             "port": config.get('metadb', 'port')
         }
-    try:
-        db_credentials['container_id'] = pg.create_postgres_instance('postgraas_master_db', db_credentials)
-    except ValueError as e:
+    if pg.check_container_exists('postgraas_master_db'):
         print "warning container already exists"
         postgraas_db = pg.get_container_by_name('postgraas_master_db')
-        db_credentials['container_id'] = postgraas_db['Id']
+        db_credentials['container_id'] = postgraas_db.id
+    else:
+        db_credentials['container_id'] = pg.create_postgres_instance('postgraas_master_db', db_credentials)
     return db_credentials
 
 

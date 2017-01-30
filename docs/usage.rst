@@ -53,8 +53,8 @@ And the response is the list::
         {
             "username": "db_user",
             "container_id": "193f0d94d49fa26626fdbdb583e9453f923468b01eac59207b4852831a105c03",
-            "db_name": "my_db", "postgraas_instance_name":
-            "my_postgraas",
+            "db_name": "my_db",
+            "postgraas_instance_name": "my_postgraas",
             "password": "",
             "creation_timestamp": "2016-07-06T23:38:38.367493",
             "id": 1,
@@ -69,9 +69,16 @@ Delete an instance
 
 With a DELETE request to the uri of the instance you can delete an instance::
 
-    curl -H "Content-Type: application/json" -X DELETE http://localhost:8080/api/v2/postgraas_instances/1
+    curl -H "Content-Type: application/json" -X DELETE --data @pwd.json http://localhost:8080/api/v2/postgraas_instances/1
 
-with the highly useful response::
+where the `pwd.json` file contains the postgres password as "db_pwd" key, e.g.::
+
+    {
+        "db_pwd": "secret"
+    }
+
+
+You will get a response like this::
 
     {
         "status": "success",

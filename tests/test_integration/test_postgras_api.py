@@ -1,12 +1,13 @@
 import unittest
 import os
-from mock import patch
+from mock import patch, MagicMock, Mock
+
 import json
 import postgraas_server.configuration as configuration
 from postgraas_server.create_app import create_app
 import postgraas_server.postgres_instance_driver as pid
 import docker
-from docker.errors import APIError
+from .utils import wait_for_postgres_listening
 
 
 class TestPostgraasApi(unittest.TestCase):
@@ -20,17 +21,16 @@ class TestPostgraasApi(unittest.TestCase):
 
     def delete_instance_by_name(self, db_credentials):
         id = self.get_postgraas_by_name(db_credentials["postgraas_instance_name"])
-        self.app.delete('/api/v2/postgraas_instances/' + str(id))
+        db_pwd = db_credentials["db_pwd"]
+        headers = {'Content-Type': 'application/json'}
+        self.app.delete('/api/v2/postgraas_instances/' + str(id),
+                        data=json.dumps({'db_pwd': db_pwd}), headers=headers)
 
     def delete_all_test_postgraas_container(self):
-        c = docker.Client(base_url='unix://var/run/docker.sock',
-                            timeout=30,
-                            version='auto')
-        containers = c.containers()
-        for container in containers:
-            for name in container['Names']:
-                if name.startswith("/tests_postgraas_") and "postgraas" in container['Labels']:
-                    c.remove_container(container['Id'], force=True)
+        c = pid._docker_client()
+        for container in c.containers.list():
+            if container.name.startswith("tests_postgraas_"):
+                container.remove(force=True)
 
     def setUp(self):
         self.module_path = os.path.abspath(os.path.dirname(__file__))
@@ -52,9 +52,7 @@ class TestPostgraasApi(unittest.TestCase):
         with self.this_app.app_context():
             db.drop_all()
 
-    @patch.object(docker.Client, 'create_container', return_value={'Id': 'fy8rfsufusgsufbvluluivhhvsbr'})
-    @patch.object(docker.Client, 'start', return_value=None)
-    def test_create_postgres_instance(self, mockerclientstart, mockerclientcreate):
+    def test_create_postgres_instance(self):
         db_credentials = {
             "db_name": 'test_db_name',
             "db_username": 'test_db_username',
@@ -62,7 +60,11 @@ class TestPostgraasApi(unittest.TestCase):
             "host": pid.get_hostname(),
             "port": pid.get_open_port()
         }
-        result = pid.create_postgres_instance('tests_postgraas_test_instance_name', db_credentials)
+        mock_c = MagicMock()
+        mock_c.id = 'fy8rfsufusgsufbvluluivhhvsbr'
+        mock_create = Mock(return_value = mock_c)
+        with patch.object(docker.models.containers.ContainerCollection, 'create', mock_create):
+            result = pid.create_postgres_instance('tests_postgraas_test_instance_name', db_credentials)
         self.assertEqual(result, 'fy8rfsufusgsufbvluluivhhvsbr')
 
     def test_create_postgres_instance_api(self):
@@ -76,11 +78,10 @@ class TestPostgraasApi(unittest.TestCase):
         headers = {'Content-Type': 'application/json'}
         result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         created_db = json.loads(result.data)
-        print created_db
         self.assertEqual(created_db["db_name"], 'test_create_postgres_instance')
         self.delete_instance_by_name(db_credentials)
 
-    def test_delete_postgres_instance_api(self):
+    def test_create_docker_fails(self):
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
             "db_name": "test_create_postgres_instance",
@@ -89,23 +90,96 @@ class TestPostgraasApi(unittest.TestCase):
         }
         self.delete_instance_by_name(db_credentials)
         headers = {'Content-Type': 'application/json'}
+
+        def raise_apierror(*args, **kwargs):
+            raise docker.errors.NotFound('let create fail')
+
+        with patch.object(docker.models.containers.ContainerCollection, 'create', raise_apierror):
+            result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        created_db = json.loads(result.data)
+        self.assertTrue('let create fail' in created_db["msg"], 'unexpected error message for docker create failure')
+
+    def test_delete_postgres_instance_api(self):
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_delete_postgres_instance_api",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "db_user",
+            "db_pwd": "secret"
+        }
+        self.delete_instance_by_name(db_credentials)
+        headers = {'Content-Type': 'application/json'}
         result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
         created_db = json.loads(result.data)
-        delete_result = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]))
+        wait_success = wait_for_postgres_listening(created_db['container_id'])
+        self.assertTrue(wait_success, 'postgres did not come up within 10s (or unexpected docker image log output)')
+        delete_result = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+                                        data=json.dumps({'db_pwd': 'wrong_password'}), headers=headers)
+        deleted_db = json.loads(delete_result.data)
+
+        self.assertEqual(deleted_db["status"], 'failed')
+        self.assertTrue('password authentication failed' in deleted_db['msg'], 'unexpected message for wrong password')
+
+        def raise_apierror(*args, **kwargs):
+            raise docker.errors.NotFound('let remove fail')
+
+        with patch.object(docker.models.containers.Container, 'remove', raise_apierror):
+            delete_result = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+                                            data=json.dumps({'db_pwd': db_credentials['db_pwd']}), headers=headers)
+            deleted_db = json.loads(delete_result.data)
+            self.assertEqual(deleted_db["status"], 'failed')
+            self.assertTrue('let remove fail' in deleted_db['msg'], 'unexpected error message on docker rm failure')
+
+        delete_result = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+                                        data=json.dumps({'db_pwd': db_credentials['db_pwd']}), headers=headers)
         deleted_db = json.loads(delete_result.data)
         self.assertEqual(deleted_db["status"], 'success')
-        self.delete_instance_by_name(db_credentials)
 
-    @patch.object(docker.Client, 'create_container', return_value={'Id': 'fy8rfsufusgsufbvluluivhhvsbr'})
-    def test_create_postgres_instance_fail(self, mockerclientcreate):
+    def test_delete_docker_notfound(self):
         db_credentials = {
-            "db_name": 'test_db_name',
-            "db_username": 'test_db_username',
-            "db_pwd": 'test_db_pwd',
-            "host": pid.get_hostname(),
-            "port": pid.get_open_port()
+            "postgraas_instance_name": "tests_postgraas_test_delete_docker_notfound",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "db_user",
+            "db_pwd": "secret"
         }
-        self.assertRaises(APIError, pid.create_postgres_instance, 'test_instance_name', db_credentials)
+        self.delete_instance_by_name(db_credentials)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app.post('/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials))
+        created_db = json.loads(result.data)
+        wait_success = wait_for_postgres_listening(created_db['container_id'])
+        self.assertTrue(wait_success, 'postgres did not come up within 10s (or unexpected docker image log output)')
+
+        def raise_not_found(*args, **kwargs):
+            raise docker.errors.NotFound('raise for testing from mock')
+
+        with patch.object(docker.models.containers.ContainerCollection, 'get', raise_not_found):
+            res = self.app.delete('/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+                                  data=json.dumps({'db_pwd': db_credentials['db_pwd']}), headers=headers)
+            res = json.loads(res.data)
+        self.assertEqual(res['status'], 'success')
+        self.assertTrue('deleted postgraas instance, but container was not found' in res['msg'], 'unexpected delete message')
+
+    def test_delete_notfound(self):
+        headers = {'Content-Type': 'application/json'}
+        res = self.app.delete('/api/v2/postgraas_instances/123456789',
+                              data=json.dumps({'db_pwd': '123'}), headers=headers)
+        res = json.loads(res.data)
+        self.assertEqual(res['status'], 'failed')
+        self.assertTrue("123456789" in res['msg'], 'unexpected error message')
+
+    def test_driver_name_exists(self):
+        db_credentials = {
+                "db_name": 'test_db_name',
+                "db_username": 'test_db_username',
+                "db_pwd": 'test_db_pwd',
+                "host": pid.get_hostname(),
+                "port": pid.get_open_port()
+        }
+        if pid.check_container_exists('test_instance_name'):
+            pid.delete_postgres_instance('test_instance_name')
+        id0 = pid.create_postgres_instance('test_instance_name', db_credentials)
+        self.assertRaises(ValueError, pid.create_postgres_instance, 'test_instance_name', db_credentials)
+        pid.delete_postgres_instance(id0)
+        self.assertFalse(pid.check_container_exists(id0), "container exists after it was deleted")
 
     def test_create_postgres_instance_name_exists(self):
         db_credentials = {

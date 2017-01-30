@@ -2,7 +2,7 @@
 [run]
 branch = True
 source = postgraas_server
-# omit = bad_file.py
+omit = setup.py
 
 [report]
 # Regexes for lines to exclude from consideration
