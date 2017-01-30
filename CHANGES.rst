@@ -2,6 +2,11 @@
 Changelog
 =========
 
+latest
+======
+
+- added authentication to delete resource
+
 v0.1.8
 ======
 
