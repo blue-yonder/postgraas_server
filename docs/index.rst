@@ -12,6 +12,7 @@ Contents
 
    Installation <installation>
    Usage <usage>
+   Configuration <configuration>
    Troubleshooting <troubleshooting>
    License <license>
    Authors <authors>

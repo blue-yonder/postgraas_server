@@ -1,4 +1,6 @@
+blinker
 flask
 flask-restful
 flask-sqlalchemy
 psycopg2
+raven

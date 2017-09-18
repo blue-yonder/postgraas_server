@@ -6,7 +6,7 @@ latest
 ======
 
 - add support for simple Postgres Cluster as backend
-
+- add support for sentry (https://sentry.io)
 
 v0.1.9
 ======
