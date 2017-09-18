@@ -57,11 +57,7 @@ def get_application_config(config):
 
 
 def get_meta_db_config_path(config):
-    try:
-        server = config.get('metadb', 'server')
-        username = '@'.join([config.get('metadb', 'db_username'), server])
-    except ConfigParser.NoOptionError:
-        username = config.get('metadb', 'db_username')
+    username = get_user(config)
 
     db_path = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
         db_name=config.get('metadb', 'db_name'),
@@ -71,3 +67,12 @@ def get_meta_db_config_path(config):
         port=config.get('metadb', 'port')
     )
     return db_path
+
+
+def get_user(config):
+    try:
+        server = config.get('metadb', 'server')
+        username = '@'.join([config.get('metadb', 'db_username'), server])
+    except ConfigParser.NoOptionError:
+        username = config.get('metadb', 'db_username')
+    return username
