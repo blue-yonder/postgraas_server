@@ -1,7 +1,4 @@
-__author__ = 'sebastian neubauer'
 import docker
-import psycopg2
-import time
 
 
 def get_hostname():
@@ -17,7 +14,7 @@ def get_open_port():
     # this should be done somewhere else, e.g docker itself, but for now...
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("",0))
+    s.bind(("", 0))
     s.listen(1)
     port = s.getsockname()[1]
     s.close()
@@ -50,12 +47,14 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
     if check_container_exists(postgraas_instance_name):
         raise ValueError('Container exists already')
     image = 'postgres:9.4'
-    container = c.containers.create(image,
-                                    name=postgraas_instance_name,
-                                    ports={internal_port: connection_dict['port']},
-                                    environment=environment,
-                                    restart_policy={"Name": "unless-stopped"},
-                                    labels={"postgraas": image})
+    container = c.containers.create(
+        image,
+        name=postgraas_instance_name,
+        ports={internal_port: connection_dict['port']},
+        environment=environment,
+        restart_policy={"Name": "unless-stopped"},
+        labels={"postgraas": image}
+    )
     container.start()
     return container.id
 
@@ -63,15 +62,3 @@ def create_postgres_instance(postgraas_instance_name, connection_dict):
 def delete_postgres_instance(container_id):
     c = _docker_client()
     c.containers.get(container_id).remove(force=True)
-
-
-def wait_for_postgres(dbname, user, password, host, port):
-    """
-    Try to connect to postgres every second, until it succeeds.
-    """
-    for i in range(540):
-        try:
-            conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
-        except psycopg2.OperationalError as e:
-            print i, " ..waiting for db"
-            time.sleep(1)

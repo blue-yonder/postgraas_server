@@ -5,6 +5,7 @@ from sqlalchemy.orm import RelationshipProperty
 
 logger = logging.getLogger(__name__)
 
+
 def is_sane_database(Base, session):
     """
     from: http://stackoverflow.com/questions/30428639/check-database-schema-matches-sqlalchemy-models-on-application-startup
@@ -45,11 +46,17 @@ def is_sane_database(Base, session):
                 else:
                     for column in column_prop.columns:
                         # Assume normal flat column
-                        if not column.key in columns:
-                            logger.error("Model %s declares column %s which does not exist in database %s", klass, column.key, engine)
+                        if column.key not in columns:
+                            logger.error(
+                                "Model %s declares column %s which does not exist in database %s",
+                                klass, column.key, engine
+                            )
                             errors = True
         else:
-            logger.error("Model %s declares table %s which does not exist in database %s", klass, table, engine)
+            logger.error(
+                "Model %s declares table %s which does not exist in database %s", klass, table,
+                engine
+            )
             errors = True
     return not errors
 

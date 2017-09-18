@@ -3,13 +3,27 @@ python:
 - '2.7'
 services:
 - docker
+- postgresql
+addons:
+  postgresql: "9.4"
+env:
+- PGDATABASE=postgres PGUSER=postgres PGPASSWORD=postgraas_password
 before_install:
 - docker pull postgres:9.4
+- psql -c "alter user $PGUSER with password '$PGPASSWORD';" -U postgres
+- sudo sed -ie 's/trust/md5/g' /etc/postgresql/9.4/main/pg_hba.conf
+- sudo service postgresql restart
 install:
-- pip install -r requirements.txt
-- pip install -r requirements_dev.txt
-- pip install -e .
+- pip install pip-tools
+- pip-compile --upgrade -o requirements-pinned.txt requirements.txt requirements_secrets.in requirements_prometheus.in
+- pip-compile --upgrade -o test-requirements-pinned.txt requirements-pinned.txt requirements_dev.txt
+- cat requirements-pinned.txt
+- pip install -r test-requirements-pinned.txt
+- pip install pyscaffold
 - pip install coveralls
+- pip install -e .[docker]
+- pip freeze
+
 script: py.test
 after_success:
 - coveralls

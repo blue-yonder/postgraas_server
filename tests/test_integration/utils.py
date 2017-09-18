@@ -1,5 +1,6 @@
 import time
-from postgraas_server.postgres_instance_driver import _docker_client
+
+from postgraas_server.backends.docker.postgres_instance_driver import _docker_client
 
 
 def wait_for_postgres_listening(container_id, timeout=10):

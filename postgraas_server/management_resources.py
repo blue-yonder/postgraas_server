@@ -1,14 +1,14 @@
-__author__ = 'sebastianneubauer'
 import datetime
-from flask_sqlalchemy import SQLAlchemy
-from flask_restful import fields, Resource, marshal_with, Api, reqparse
-from docker.errors import APIError
 import logging
-import docker
-import postgres_instance_driver as pg
 import psycopg2
-logger = logging.getLogger(__name__)
 
+from flask import current_app
+from flask_restful import fields, Resource, marshal_with, reqparse, abort
+from flask_sqlalchemy import SQLAlchemy
+
+from postgraas_server.backends.exceptions import PostgraasApiException
+
+logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 
@@ -24,7 +24,16 @@ class DBInstance(db.Model):
     port = db.Column(db.Integer)
     container_id = db.Column(db.String(100))
 
-    def __init__(self, postgraas_instance_name, db_name, username, password, hostname, port, container_id):
+    def __init__(
+        self,
+        postgraas_instance_name,
+        db_name,
+        username,
+        password,
+        hostname,
+        port,
+        container_id=None
+    ):
         self.postgraas_instance_name = postgraas_instance_name
         self.creation_timestamp = datetime.datetime.now()
         self.db_name = db_name
@@ -35,7 +44,9 @@ class DBInstance(db.Model):
         self.container_id = container_id
 
     def __repr__(self):
-        return '<PGName {} User {} Docker_id {}>'.format(self.postgraas_instance_name, self.username, self.container_id)
+        return '<PGName {} User {} Docker_id {}>'.format(
+            self.postgraas_instance_name, self.username, self.container_id
+        )
 
 
 db_instance_marshaller = {
@@ -52,7 +63,6 @@ db_instance_marshaller = {
 
 
 class DBInstanceResource(Resource):
-
     @marshal_with(db_instance_marshaller)
     def get(self, id):
         entity = DBInstance.query.get(id)
@@ -69,24 +79,37 @@ class DBInstanceResource(Resource):
 
         connection_error = None
         try:
-            conn = psycopg2.connect(user=entity.username, password=args['db_pwd'],
-                                    host='127.0.0.1', port=entity.port, dbname=entity.db_name)
+            conn = psycopg2.connect(
+                user=entity.username,
+                password=args['db_pwd'],
+                host=current_app.postgraas_backend.master_hostname,
+                port=entity.port,
+                dbname=entity.db_name
+            )
             conn.close()
         except StandardError as ex:
             connection_error = str(ex)
 
         if connection_error is not None:
-            return {'status': 'failed', 'msg': 'Could not connect to postgres instance: {}'.format(connection_error)}
+            return {
+                'status': 'failed',
+                'msg': 'Could not connect to postgres instance: {}'.format(connection_error)
+            }
 
-        if not pg.check_container_exists(entity.container_id):
-            logger.warning("container {} does not exist, how could that happen?".format(entity.container_id))
+        if not current_app.postgraas_backend.exists(entity):
+            logger.warning(
+                "container {} does not exist, how could that happen?".format(entity.container_id)
+            )
             db.session.delete(entity)
             db.session.commit()
-            return {'status': 'success', 'msg': 'deleted postgraas instance, but container was not found...'}
+            return {
+                'status': 'success',
+                'msg': 'deleted postgraas instance, but container was not found...'
+            }
 
         try:
-            pg.delete_postgres_instance(entity.container_id)
-        except APIError as e:
+            current_app.postgraas_backend.delete(entity)
+        except PostgraasApiException as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
             return {'status': 'failed', 'msg': str(e)}
         db.session.delete(entity)
@@ -95,7 +118,6 @@ class DBInstanceResource(Resource):
 
 
 class DBInstanceCollectionResource(Resource):
-
     @marshal_with(db_instance_marshaller)
     def get(self):
         all = DBInstance.query.all()
@@ -103,33 +125,60 @@ class DBInstanceCollectionResource(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('postgraas_instance_name', required=True, type=str, help='name of the postgraas instance')
+        parser.add_argument(
+            'postgraas_instance_name',
+            required=True,
+            type=str,
+            help='name of the postgraas instance'
+        )
         parser.add_argument('db_name', required=True, type=str, help='name of the db')
         parser.add_argument('db_username', required=True, type=str, help='username of the db')
         parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
         args = parser.parse_args()
+
+        if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']
+                                      ).first():
+            return {
+                'msg':
+                "postgraas_instance_name already exists {}".format(args['postgraas_instance_name'])
+            }
+
         db_credentials = {
             "db_name": args['db_name'],
             "db_username": args['db_username'],
             "db_pwd": args['db_pwd'],
-            "host": pg.get_hostname(),
-            "port": pg.get_open_port()
+            "host": current_app.postgraas_backend.hostname,
+            "port": current_app.postgraas_backend.port
         }
-        if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']).first():
-            return {'msg': "postgraas_instance_name already exists {}".format(args['postgraas_instance_name']) }
+
+        db_entry = DBInstance(
+            postgraas_instance_name=args['postgraas_instance_name'],
+            db_name=args['db_name'],
+            username=db_credentials['db_username'],
+            password="",
+            hostname=db_credentials['host'],
+            port=db_credentials['port']
+        )
+        if current_app.postgraas_backend.exists(db_entry):
+            abort(409,
+                description="database or user already exists {}, {}".format(args['db_name'], args['db_username'])
+            )
+
         try:
-            db_credentials['container_id'] = pg.create_postgres_instance(args['postgraas_instance_name'],
-                                                                         db_credentials)
-        except APIError as e:
+            db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
+        except PostgraasApiException as e:
             return {'msg': str(e)}
-        db_entry = DBInstance(postgraas_instance_name=args['postgraas_instance_name'],
-                              db_name=args['db_name'],
-                              username=args['db_username'],
-                              password="",
-                              hostname=db_credentials['host'],
-                              port=db_credentials['port'],
-                              container_id=db_credentials['container_id'])
+
+        if '@' not in args['db_username']:
+            try:
+                username = '@'.join([args['db_username'], current_app.postgraas_backend.server])
+            except (AttributeError, KeyError):
+                username = args['db_username']
+            db_entry.username = username
+
         db.session.add(db_entry)
         db.session.commit()
+        db_credentials["container_id"] = db_entry.container_id
         db_credentials["postgraas_instance_id"] = db_entry.id
-        return db_credentials
+        db_credentials["db_username"] = username
+        return db_credentials, 201

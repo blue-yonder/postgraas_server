@@ -5,6 +5,12 @@ Changelog
 latest
 ======
 
+- add support for simple Postgres Cluster as backend
+
+
+v0.1.9
+======
+
 - added authentication to delete resource
 
 v0.1.8
