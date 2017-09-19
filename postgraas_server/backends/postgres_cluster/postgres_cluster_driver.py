@@ -36,7 +36,7 @@ def create_postgres_db(connection_dict, config):
     create_role = "CREATE USER {db_username} WITH PASSWORD '{db_pwd}';".format(**connection_dict)
     drop_role = "DROP ROLE {db_username};".format(**connection_dict)
     grant_role = 'GRANT {db_username} TO "{postgraas_user}";'.format(
-        db_username=connection_dict['db_username'], postgraas_user=config['username'].split('@')[0]
+        db_username=connection_dict['db_username'], postgraas_user=get_normalized_username(config['username'])
     )
     create_database = "CREATE DATABASE {db_name} OWNER {db_username};".format(**connection_dict)
     try:
@@ -51,6 +51,10 @@ def create_postgres_db(connection_dict, config):
     except psycopg2.ProgrammingError as e:
         cur.execute(drop_role)
         raise ValueError(e.args[0])
+
+
+def get_normalized_username(username):
+    return username.split('@')[0]
 
 
 def delete_database(db_name, config):
@@ -69,6 +73,6 @@ def delete_user(username, config):
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = con.cursor()
     try:
-        cur.execute('''DROP USER "{}";'''.format(username))
+        cur.execute('''DROP USER "{}";'''.format(get_normalized_username(username)))
     except psycopg2.ProgrammingError as e:
         raise ValueError(e.args[0])
