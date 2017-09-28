@@ -11,7 +11,7 @@ class DockerBackend(object):
         from . import postgres_instance_driver as pg
         try:
             return pg.create_postgres_instance(entity.postgraas_instance_name, connection_info)
-        except APIError as e:
+        except (APIError, ValueError) as e:
             raise PostgraasApiException(str(e))
 
     def delete(self, entity):

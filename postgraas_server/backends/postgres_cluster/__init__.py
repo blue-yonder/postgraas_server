@@ -1,13 +1,16 @@
 from . import postgres_cluster_driver as pgcd
-
+from ..exceptions import PostgraasApiException
 
 class PGClusterBackend(object):
     def __init__(self, config):
         self.config = config
 
     def create(self, entity, connection_info):
-        pgcd.create_postgres_db(connection_info, self.config)
-        return entity.id
+        try:
+            pgcd.create_postgres_db(connection_info, self.config)
+        except ValueError as e:
+            raise PostgraasApiException(str(e))
+        return None
 
     def delete(self, entity):
         pgcd.delete_database(entity.db_name, self.config)

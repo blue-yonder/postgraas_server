@@ -200,3 +200,24 @@ class TestPostgraasApi(PostgraasApiTestBase):
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
         delete_test_database_and_user(db_credentials_same_user['db_name'], db_credentials_same_user['db_username'], backend_config)
         assert ("database or user already exists" in json.loads(response.data)['description']) is True
+
+    def test_create_postgres_instance_bad_username(self):
+        config = ConfigParser.ConfigParser()
+
+        config.readfp(StringIO.StringIO(CONFIGS[self.backend]))
+        backend_config = dict(config.items('backend'))
+        print config
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
+            "db_name": 'test_create_postgres_instance_exists',
+            "db_username": 'test-invalid-username',
+            "db_pwd": 'test_db_pwd',
+            "host": backend_config['host'],
+            "port": backend_config['port']
+        }
+        response = self.app_client.post('/api/v2/postgraas_instances',
+                                        data=json.dumps(db_credentials),
+                                        headers={'Content-Type': 'application/json'})
+        print response.data
+        delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
+        assert ('syntax error at or near "-"' in json.loads(response.data)['msg']) is True
