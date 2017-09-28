@@ -2,6 +2,7 @@ from . import postgres_cluster_driver as pgcd
 from ..exceptions import PostgraasApiException
 
 class PGClusterBackend(object):
+
     def __init__(self, config):
         self.config = config
 
@@ -13,8 +14,14 @@ class PGClusterBackend(object):
         return None
 
     def delete(self, entity):
-        pgcd.delete_database(entity.db_name, self.config)
-        pgcd.delete_user(entity.username, self.config)
+        try:
+            pgcd.delete_database(entity.db_name, self.config)
+            pgcd.delete_user(entity.username, self.config)
+        except ValueError as e:
+            if 'does not exist' in e.message:
+                raise PostgraasApiException("Could not delete, does not exist {}".format(entity.db_name))
+            else:
+                raise PostgraasApiException(str(e))
 
     def exists(self, entity):
         return pgcd.check_db_or_user_exists(entity.db_name, entity.username, self.config)
