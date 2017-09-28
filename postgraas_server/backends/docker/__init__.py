@@ -11,16 +11,21 @@ class DockerBackend(object):
         from . import postgres_instance_driver as pg
         try:
             return pg.create_postgres_instance(entity.postgraas_instance_name, connection_info)
-        except APIError as e:
+        except (APIError, ValueError) as e:
             raise PostgraasApiException(str(e))
 
     def delete(self, entity):
-        from docker.errors import APIError
+        from docker.errors import APIError, NullResource, NotFound
         from . import postgres_instance_driver as pg
+        if not entity.container_id:
+            raise PostgraasApiException("container ID not provided")
         try:
             return pg.delete_postgres_instance(entity.container_id)
-        except APIError as e:
+        except NotFound as e:
+            raise PostgraasApiException("Could not delete, does not exist {}".format(entity.container_id))
+        except (APIError, NullResource) as e:
             raise PostgraasApiException(str(e))
+
 
     def exists(self, entity):
         from . import postgres_instance_driver as pg
