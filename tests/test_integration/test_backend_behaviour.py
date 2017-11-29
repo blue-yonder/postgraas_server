@@ -195,3 +195,25 @@ class TestPostgraasApi():
                 db_entry.container_id = self.this_app.postgraas_backend.create(db_entry, db_credentials)
                 self.this_app.postgraas_backend.delete(db_entry)
             assert 'syntax error at or near "-"' in excinfo.value.message
+
+    def test_delete_nonexisting_db(self):
+        db_credentials = {
+            "db_name": 'tests_postgraas_instance_name',
+            "db_username": 'tests_postgraas_db-bad username',
+            "db_pwd": 'test_db_pwd',
+            "host": pid.get_hostname(),
+            "port": pid.get_open_port()
+        }
+        db_entry = DBInstance(
+            postgraas_instance_name=db_credentials['db_name'],
+            db_name=db_credentials['db_name'],
+            username=db_credentials['db_username'],
+            password="",
+            hostname=db_credentials['host'],
+            port=db_credentials['port'],
+            container_id="4n8nz48az49prdmdmprmr4doesnotexit"
+
+        )
+        with pytest.raises(PostgraasApiException) as excinfo:
+            db_entry.container_id = self.this_app.postgraas_backend.delete(db_entry)
+        assert 'does not exist' in excinfo.value.message
