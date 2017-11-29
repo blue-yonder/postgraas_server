@@ -18,9 +18,9 @@ class DBInstance(db.Model):
     postgraas_instance_name = db.Column(db.String(100))
     creation_timestamp = db.Column(db.DateTime)
     db_name = db.Column(db.String(100))
-    username = db.Column(db.String(100))
+    username = db.Column(db.String(500))
     password = db.Column(db.String(100))
-    hostname = db.Column(db.String(50))
+    hostname = db.Column(db.String(500))
     port = db.Column(db.Integer)
     container_id = db.Column(db.String(100))
 
