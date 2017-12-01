@@ -13,7 +13,7 @@ from postgraas_server.backends.exceptions import PostgraasApiException
 from postgraas_server.create_app import create_app
 from .utils import wait_for_postgres_listening
 
-DOCKER_CONFIG = """
+DOCKER_CONFIG = u"""
 [metadb]
 db_name = postgraas
 db_username = postgraas
@@ -25,7 +25,7 @@ port = 54321
 type = docker
 """
 
-CLUSTER_CONFIG = """
+CLUSTER_CONFIG = u"""
 [metadb]
 db_name = postgraas
 db_username = postgraas

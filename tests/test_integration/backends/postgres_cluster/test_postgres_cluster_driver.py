@@ -10,7 +10,7 @@ from postgraas_server.create_app import create_app
 import postgraas_server.backends.postgres_cluster.postgres_cluster_driver as pgcd
 from postgraas_server.backends.postgres_cluster import PGClusterBackend
 
-CLUSTER_CONFIG = """[metadb]
+CLUSTER_CONFIG = u"""[metadb]
 db_name = postgraas
 db_username = postgraas
 db_pwd = postgraas12
