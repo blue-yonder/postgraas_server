@@ -3,7 +3,7 @@ import os
 import json
 import errno
 import logging
-import ConfigParser
+from configparser import ConfigParser
 
 __all__ = ['get_config', 'get_default_config_filename', 'get_application_config', 'expand_env_vars']
 
@@ -17,8 +17,9 @@ def get_default_config_filename():
 
 def _load_secrets(filename='/secrets'):
     try:
-        with open(filename, 'rb') as secrets_file:
+        with open(filename, 'r') as secrets_file:
             secrets = json.loads(secrets_file.read())
+            print(secrets)
     except IOError as e:
         if e.errno in (errno.ENOENT, errno.EISDIR):
             return {}
@@ -28,7 +29,7 @@ def _load_secrets(filename='/secrets'):
 
 
 def get_config(config_filename=get_default_config_filename(), secrets_file='/secrets'):
-    config = ConfigParser.RawConfigParser()
+    config = ConfigParser()
     logger.debug('config filename: {}'.format(config_filename))
     secrets = _load_secrets(filename=secrets_file)
     if secrets:
@@ -36,7 +37,8 @@ def get_config(config_filename=get_default_config_filename(), secrets_file='/sec
         f = Fernet(secrets['encryption_key'].encode())
         with open(config_filename, 'rb') as cfg:
             cfg_content = f.decrypt(cfg.read())
-        config.readfp(io.BytesIO(cfg_content))
+        print(cfg_content)
+        config.read_string(cfg_content.decode("utf-8") )
     else:
         config.read(config_filename)
     expand_env_vars(config)
@@ -51,8 +53,8 @@ def expand_env_vars(config):
 
 def get_application_config(config):
     try:
-        return config.items('application')
-    except ConfigParser.NoSectionError:
+        return config['application']
+    except KeyError:
         return []
 
 
@@ -70,9 +72,9 @@ def get_meta_db_config_path(config):
 
 
 def get_user(config):
-    try:
-        server = config.get('metadb', 'server')
+    server = config.get('metadb', 'server', fallback=None)
+    if server:
         username = '@'.join([config.get('metadb', 'db_username'), server])
-    except ConfigParser.NoOptionError:
+    else:
         username = config.get('metadb', 'db_username')
     return username

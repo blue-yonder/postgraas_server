@@ -123,7 +123,7 @@ class PostgraasApiTestBase:
     def get_postgraas_by_name(self, name, client):
         headers = {'Content-Type': 'application/json'}
         list = client.get('/api/v2/postgraas_instances', headers=headers)
-        for instance in json.loads(list.data):
+        for instance in json.loads(list.get_data(as_text=True)):
             if instance["postgraas_instance_name"] == name:
                 return instance["id"]
 
@@ -154,7 +154,7 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
         result = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
-        created_db = json.loads(result.data)
+        created_db = json.loads(result.get_data(as_text=True))
         assert created_db["db_name"] == 'test_create_postgres_instance'
         self.delete_instance_by_name(db_credentials, self.app_client)
 
@@ -175,7 +175,7 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
             result = self.app_client.post(
                 '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
             )
-        created_db = json.loads(result.data)
+        created_db = json.loads(result.get_data(as_text=True))
         assert 'let create fail' in created_db[
             "msg"
         ], 'unexpected error message for docker create failure'
@@ -192,7 +192,7 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
         result = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
-        created_db = json.loads(result.data)
+        created_db = json.loads(result.get_data(as_text=True))
         wait_success = wait_for_postgres_listening(created_db['container_id'])
         assert wait_success is True, 'postgres did not come up within 10s (or unexpected docker image log output)'
 
@@ -207,7 +207,7 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
                 }),
                 headers=headers
             )
-            res = json.loads(res.data)
+            res = json.loads(res.get_data(as_text=True))
         assert res['status'] == 'success'
         assert 'deleted postgraas instance, but container was not found' in res['msg']
 
@@ -251,8 +251,8 @@ class TestPostgraasApi(PostgraasApiTestBase):
     def test_delete_postgres_instance_api(self):
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_delete_postgres_instance_api",
-            "db_name": self.db_name.decode(),
-            "db_username": self.username.decode(),
+            "db_name": self.db_name,
+            "db_username": self.username,
             "db_pwd": "secret"
         }
         self.delete_instance_by_name(db_credentials, self.app_client)
@@ -260,7 +260,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         result = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
-        created_db = json.loads(result.data)
+        created_db = json.loads(result.get_data(as_text=True))
 
         if self.backend == 'docker':
             wait_success = wait_for_postgres_listening(created_db['container_id'])
@@ -273,7 +273,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
             }),
             headers=headers
         )
-        deleted_db = json.loads(delete_result.data)
+        deleted_db = json.loads(delete_result.get_data(as_text=True))
 
         assert deleted_db["status"] == 'failed'
         assert 'password authentication failed' in deleted_db[
@@ -292,7 +292,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
                     }),
                     headers=headers
                 )
-                deleted_db = json.loads(delete_result.data)
+                deleted_db = json.loads(delete_result.get_data(as_text=True))
                 assert deleted_db["status"] == 'failed'
                 assert 'let remove fail' in deleted_db[
                     'msg'
@@ -305,7 +305,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
             }),
             headers=headers
         )
-        deleted_db = json.loads(delete_result.data)
+        deleted_db = json.loads(delete_result.get_data(as_text=True))
         assert deleted_db["status"] == 'success'
 
     def test_delete_notfound(self):
@@ -317,15 +317,15 @@ class TestPostgraasApi(PostgraasApiTestBase):
             }),
             headers=headers
         )
-        res = json.loads(res.data)
+        res = json.loads(res.get_data(as_text=True))
         assert res['status'] == 'failed'
         assert "123456789" in res['msg'], 'unexpected error message'
 
     def test_create_postgres_instance_name_exists(self):
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_my_postgraas_twice",
-            "db_name": self.db_name.decode(),
-            "db_username": self.username.decode(),
+            "db_name": self.db_name,
+            "db_username": self.username,
             "db_pwd": "secret"
         }
         self.delete_instance_by_name(db_credentials, self.app_client)
@@ -336,7 +336,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         second = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
-        assert second.data == json.dumps(
+        assert second.get_data(as_text=True) == json.dumps(
             {
                 "msg": "postgraas_instance_name already exists tests_postgraas_my_postgraas_twice"
             }
@@ -347,8 +347,8 @@ class TestPostgraasApi(PostgraasApiTestBase):
     def test_return_postgres_instance_api(self):
         db_credentials = {
             u"postgraas_instance_name": u"tests_postgraas_test_return_postgres_instance_api",
-            u"db_name": self.db_name.decode(),
-            u"db_username": self.username.decode(),
+            u"db_name": self.db_name,
+            u"db_username": self.username,
             u"db_pwd": u"secret"
         }
         self.delete_instance_by_name(db_credentials, self.app_client)
@@ -356,20 +356,20 @@ class TestPostgraasApi(PostgraasApiTestBase):
         result = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
-        created_db = json.loads(result.data)
+        created_db = json.loads(result.get_data(as_text=True))
         created_db_id = created_db['postgraas_instance_id']
         actual = self.app_client.get(
             'api/v2/postgraas_instances/{}'.format(created_db_id), headers=headers
         )
         assert actual.status_code == 200
-        actual_data = json.loads(actual.data)
+        actual_data = json.loads(actual.get_data(as_text=True))
         actual_data.pop('container_id')
         actual_data.pop('port')
         actual_data.pop('creation_timestamp')
         expected = {
             u'postgraas_instance_name': u'tests_postgraas_test_return_postgres_instance_api',
-            u'db_name': self.db_name.decode(),
-            u'username': self.username.decode(),
+            u'db_name': self.db_name,
+            u'username': self.username,
             u'password': u'',
             u'hostname': self.app_client.application.postgraas_backend.hostname,
             u'id': created_db_id,

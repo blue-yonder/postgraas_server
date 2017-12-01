@@ -87,7 +87,7 @@ class DBInstanceResource(Resource):
                 dbname=entity.db_name
             )
             conn.close()
-        except StandardError as ex:
+        except Exception as ex:
             connection_error = str(ex)
 
         if connection_error is not None:

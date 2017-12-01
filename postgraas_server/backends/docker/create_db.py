@@ -13,7 +13,7 @@ def create_db_container():
         "port": config.get('metadb', 'port')
     }
     if pg.check_container_exists('postgraas_master_db'):
-        print "warning container already exists"
+        print("warning container already exists")
         postgraas_db = pg.get_container_by_name('postgraas_master_db')
         db_credentials['container_id'] = postgraas_db.id
     else:
@@ -24,7 +24,7 @@ def create_db_container():
 
 
 def main():
-    print "creating container for the management db"
+    print("creating container for the management db")
     db_credentials = create_db_container()
     wait_for_postgres(
         db_credentials['db_name'], db_credentials['db_username'], db_credentials['db_pwd'],

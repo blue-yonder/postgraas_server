@@ -1,4 +1,4 @@
-import ConfigParser
+from configparser import ConfigParser
 
 from .docker import DockerBackend
 from .postgres_cluster import PGClusterBackend

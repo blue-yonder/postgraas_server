@@ -23,7 +23,7 @@ def wait_for_postgres_listening(container_id, timeout=10):
         output = cont.logs(stdout=True, stderr=True)
         # the startup script in the docker image starts postgres twice,
         # so wait for the second start:
-        if output.count('database system is ready to accept connections') >= 2:
+        if output.count(b'database system is ready to accept connections') >= 2:
             return True
         time.sleep(0.1)
     return False

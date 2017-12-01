@@ -1,6 +1,9 @@
 import os
-import ConfigParser
-import StringIO
+from configparser import ConfigParser
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from cryptography.fernet import Fernet
 
 import postgraas_server.configuration as cf
@@ -26,9 +29,9 @@ class TestConfiguration:
 db_username = postgraas_user
 '''
 
-        config = ConfigParser.ConfigParser()
+        config = ConfigParser()
 
-        config.readfp(StringIO.StringIO(config_string))
+        config.readfp(StringIO(config_string))
         username = cf.get_user(config)
         expected = 'postgraas_user'
 
@@ -39,9 +42,9 @@ db_username = postgraas_user
 server = testserver1
 db_username = postgraas_user
 '''
-        config = ConfigParser.ConfigParser()
+        config = ConfigParser()
 
-        config.readfp(StringIO.StringIO(config_string))
+        config.readfp(StringIO(config_string))
         username = cf.get_user(config)
         expected = 'postgraas_user@testserver1'
 
@@ -52,7 +55,7 @@ db_username = postgraas_user
         key = Fernet.generate_key()
         print(key)
         f = Fernet(key)
-        secrets_file.write('{{"encryption_key": "{}"}}'.format(key))
+        secrets_file.write('{{"encryption_key": "{}"}}'.format(key.decode()))
         test_config = os.path.join(self.module_path, 'application.cfg')
         cfg_file = tmpdir.join('application.cfg')
         cfg_file.write(f.encrypt(open(test_config, 'rb').read()))

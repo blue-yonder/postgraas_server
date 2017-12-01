@@ -69,23 +69,18 @@ def delete_all_test_postgraas_container():
 def delete_all_test_database_and_user(config):
     con = pgcd._create_pg_connection(config)
     cur = con.cursor()
-    print "hier"
     cur.execute(
 '''SELECT d.datname, u.usename 
  FROM pg_database d
   JOIN pg_user u ON (d.datdba = u.usesysid);''')
     for db in cur:
-        print db[0]
         if db[0].startswith("tests_postgraas_"):
-            print db
             delete_test_database_and_user(db[0], db[1], config)
     cur.execute(
 '''SELECT u.usename 
  FROM pg_user u;''')
     for db in cur:
-        print db[0]
         if db[0].startswith("tests_postgraas_"):
-            print db
             pgcd.delete_user(db[0], config)
 
 

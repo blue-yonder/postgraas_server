@@ -18,7 +18,7 @@ class PGClusterBackend(object):
             pgcd.delete_database(entity.db_name, self.config)
             pgcd.delete_user(entity.username, self.config)
         except ValueError as e:
-            if 'does not exist' in e.message:
+            if 'does not exist' in e.args[0]:
                 raise PostgraasApiException("Could not delete, does not exist {}".format(entity.db_name))
             else:
                 raise PostgraasApiException(str(e))
