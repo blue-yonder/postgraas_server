@@ -74,7 +74,8 @@ def delete_test_database_and_user(db_name, username, config):
 def parametrized_setup(request, tmpdir):
     from postgraas_server.management_resources import db
     cfg = tmpdir.join('config')
-    cfg.write(CONFIGS[request.param])
+    with open(cfg.strpath, 'wb') as fp:
+        json.dump(CONFIGS[request.param].encode('utf-8'), fp)
     config = configuration.get_config(cfg.strpath)
     this_app = create_app(config)
     this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"

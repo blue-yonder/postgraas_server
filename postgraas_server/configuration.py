@@ -1,7 +1,6 @@
 import errno
 import json
 import logging
-from configparser import ConfigParser
 
 import os
 
@@ -17,9 +16,8 @@ def get_default_config_filename():
 
 def _load_secrets(filename='/secrets'):
     try:
-        with open(filename, 'r') as secrets_file:
+        with open(filename, 'rb') as secrets_file:
             secrets = json.loads(secrets_file.read())
-            print(secrets)
     except IOError as e:
         if e.errno in (errno.ENOENT, errno.EISDIR):
             return {}
@@ -29,26 +27,18 @@ def _load_secrets(filename='/secrets'):
 
 
 def get_config(config_filename=get_default_config_filename(), secrets_file='/secrets'):
-    config = ConfigParser()
     logger.debug('config filename: {}'.format(config_filename))
+    with open(config_filename, 'r') as cfg:
+        config = json.load(cfg)
     secrets = _load_secrets(filename=secrets_file)
     if secrets:
-        from cryptography.fernet import Fernet
-        f = Fernet(secrets['encryption_key'].encode())
-        with open(config_filename, 'rb') as cfg:
-            cfg_content = f.decrypt(cfg.read())
-        print(cfg_content)
-        config.read_string(cfg_content.decode("utf-8"))
-    else:
-        config.read(config_filename)
-    expand_env_vars(config)
+        try:
+            import secure_config.secrets as sec
+            parsed_dict = sec.load_secret_dict(password=password, config_dict=config_dict)
+        except ImportError as e:
+            logger.debug('secure_config not installed')
+
     return config
-
-
-def expand_env_vars(config):
-    for sec in config.sections():
-        for opt in config.options(sec):
-            config.set(sec, opt, os.path.expandvars(config.get(sec, opt)))
 
 
 def get_application_config(config):
@@ -72,9 +62,9 @@ def get_meta_db_config_path(config):
 
 
 def get_user(config):
-    server = config.get('metadb', 'server', fallback=None)
-    if server:
-        username = '@'.join([config.get('metadb', 'db_username'), server])
-    else:
-        username = config.get('metadb', 'db_username')
+    try:
+        server = config['metadb']['server']
+        username = '@'.join([config['metadb']['db_username'], server])
+    except KeyError:
+        username = config['metadb']['db_username']
     return username
