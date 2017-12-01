@@ -7,6 +7,7 @@ latest
 
 - add support for simple Postgres Cluster as backend
 - add support for sentry (https://sentry.io)
+- bugfix: varchar(50) field in the DB too small for hostname
 
 v0.1.9
 ======
