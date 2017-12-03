@@ -5,8 +5,14 @@ except ImportError:
     from io import StringIO
 import json
 
-import postgraas_server.configuration as cf
+try:
+    import secure_config.secrets
+    HAS_SECURE_CONFIG=True
+except ImportError:
+    HAS_SECURE_CONFIG = False
 
+import postgraas_server.configuration as cf
+import pytest
 
 class TestConfiguration:
     module_path = os.path.abspath(os.path.dirname(__file__))
@@ -53,6 +59,14 @@ class TestConfiguration:
 
         assert username == expected
 
+    @pytest.mark.skipif(not HAS_SECURE_CONFIG,
+                        reason="secure_config not installed")
     def test_secrets(self, tmpdir):
-        #TODO
-        assert True
+        expected_secret = secure_config.secrets.EncryptedSecret("v3rys3cur3", "correct_db_password")
+        print(expected_secret)
+        test_config = os.path.join(self.module_path, 'application_secure.cfg')
+        secret_file = os.path.join(self.module_path, 'secret_file.json')
+        config_undecrypted = cf.get_config(test_config)
+        assert config_undecrypted['metadb']["db_password"] == expected_secret.dumps()
+        config_decrypted = cf.get_config(test_config, secrets_file=secret_file)
+        assert config_decrypted['metadb']["db_password"].decrypt() == "correct_db_password"

@@ -16,8 +16,8 @@ def get_default_config_filename():
 
 def _load_secrets(filename='/secrets'):
     try:
-        with open(filename, 'rb') as secrets_file:
-            secrets = json.loads(secrets_file.read())
+        with open(filename, 'r') as secrets_file:
+            secrets = json.load(secrets_file)
     except IOError as e:
         if e.errno in (errno.ENOENT, errno.EISDIR):
             return {}
@@ -34,7 +34,7 @@ def get_config(config_filename=get_default_config_filename(), secrets_file='/sec
     if secrets:
         try:
             import secure_config.secrets as sec
-            parsed_dict = sec.load_secret_dict(password=password, config_dict=config_dict)
+            config = sec.load_secret_dict(password=secrets['encryption_key'], config_dict=config)
         except ImportError as e:
             logger.debug('secure_config not installed')
 
