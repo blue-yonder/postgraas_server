@@ -52,11 +52,11 @@ def get_meta_db_config_path(config):
     username = get_user(config)
 
     db_path = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
-        db_name=config.get('metadb', 'db_name'),
+        db_name=config['metadb']['db_name'],
         db_username=username,
-        db_pwd=config.get('metadb', 'db_pwd'),
-        host=config.get('metadb', 'host'),
-        port=config.get('metadb', 'port')
+        db_pwd=config['metadb']['db_pwd'],
+        host=config['metadb']['host'],
+        port=config['metadb']['port']
     )
     return db_path
 

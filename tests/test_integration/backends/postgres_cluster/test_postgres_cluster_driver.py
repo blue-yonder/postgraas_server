@@ -23,7 +23,7 @@ CLUSTER_CONFIG = {
     },
     "backend":
     {
-        "type": "docker",
+        "type": "pg_cluster",
         "host": os.environ.get('PGHOST', 'localhost'),
         "port": os.environ.get('PGPORT', '5432'),
         "database": os.environ.get('PGDATABASE', 'postgres'),
@@ -72,10 +72,10 @@ def parametrized_setup(request, tmpdir):
     request.cls.backend = request.param
     yield
     if request.param == 'pg_cluster':
-        try:
-            delete_test_database_and_user(db_name, username, dict(config.items('backend')))
-        except Exception:
-            pass
+#        try:
+            delete_test_database_and_user(db_name, username, config['backend'])
+#        except Exception:
+#            pass
     db.drop_all()
     ctx.pop()
 
@@ -103,12 +103,13 @@ class PostgraasApiTestBase:
 
 @pytest.mark.usefixtures('parametrized_setup')
 class TestPostgraasApi(PostgraasApiTestBase):
+
     def test_delete_db_and_user(self):
         backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
-            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
-            "db_name": 'test_create_postgres_instance_exists',
-            "db_username": 'test_create_postgres_instance_exists_username',
+            "postgraas_instance_name": "tests_postgraas_test_postgres_cluster_delete",
+            "db_name": 'test_delete_db_and_users',
+            "db_username": 'test_delete_db_and_user',
             "db_pwd": 'test_db_pwd',
             "host": backend_config['host'],
             "port": backend_config['port']
@@ -122,6 +123,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         response = self.app_client.post('/api/v2/postgraas_instances',
                                         data=json.dumps(db_credentials),
                                         headers={'Content-Type': 'application/json'})
+        print(backend_config)
         print(response.get_data(as_text=True))
         assert ("database or user already exists" in json.loads(response.get_data(as_text=True))['description']) is True
         delete_test_database_and_user(db_credentials['db_name'], db_credentials['db_username'], backend_config)
@@ -129,8 +131,8 @@ class TestPostgraasApi(PostgraasApiTestBase):
                                         data=json.dumps(db_credentials),
                                         headers={'Content-Type': 'application/json'})
         print(response.get_data(as_text=True))
-        assert (
-               "test_create_postgres_instance_exists" in json.loads(response.get_data(as_text=True))['db_name']) is True
+        assert ("test_delete_db_and_users" in json.loads(response.get_data(as_text=True))['db_name']) is True
+
 
     def test_create_postgres_instance_exists(self):
         backend_config = CONFIGS[self.backend]['backend']

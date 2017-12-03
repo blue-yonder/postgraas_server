@@ -13,40 +13,40 @@ from postgraas_server.backends.exceptions import PostgraasApiException
 from postgraas_server.create_app import create_app
 from .utils import wait_for_postgres_listening
 
-DOCKER_CONFIG = u"""
-[metadb]
-db_name = postgraas
-db_username = postgraas
-db_pwd = postgraas12
-host = localhost
-port = 54321
+DOCKER_CONFIG = {
+    "metadb":
+    {
+        "db_name": "postgraas",
+        "db_username": "postgraas",
+        "db_pwd": "postgraas12",
+        "host": "localhost",
+        "port": "54321"
+    },
+    "backend":
+    {
+        "type": "docker"
+    }
+}
 
-[backend]
-type = docker
-"""
-
-CLUSTER_CONFIG = u"""
-[metadb]
-db_name = postgraas
-db_username = postgraas
-db_pwd = postgraas12
-host = localhost
-port = 54321
-
-[backend]
-type = pg_cluster
-host = {host}
-port = {port}
-database = {database}
-username = {username}
-password = {password}
-""".format(
-    database=os.environ.get('PGDATABASE', 'postgres'),
-    username=os.environ.get('PGUSER', 'postgres'),
-    password=os.environ.get('PGPASSWORD', 'postgres'),
-    port=os.environ.get('PGPORT', '5432'),
-    host=os.environ.get('PGHOST', 'localhost')
-)
+CLUSTER_CONFIG = {
+    "metadb":
+    {
+        "db_name": "postgraas",
+        "db_username": "postgraas",
+        "db_pwd": "postgraas12",
+        "host": "localhost",
+        "port": "54321"
+    },
+    "backend":
+    {
+        "type": "pg_cluster",
+        "host": os.environ.get('PGHOST', 'localhost'),
+        "port": os.environ.get('PGPORT', '5432'),
+        "database": os.environ.get('PGDATABASE', 'postgres'),
+        "username": os.environ.get('PGUSER', 'postgres'),
+        "password": os.environ.get('PGPASSWORD', 'postgres')
+    }
+}
 
 CONFIGS = {
     'docker': DOCKER_CONFIG,
@@ -74,8 +74,8 @@ def delete_test_database_and_user(db_name, username, config):
 def parametrized_setup(request, tmpdir):
     from postgraas_server.management_resources import db
     cfg = tmpdir.join('config')
-    with open(cfg.strpath, 'wb') as fp:
-        json.dump(CONFIGS[request.param].encode('utf-8'), fp)
+    with open(cfg.strpath, "w", encoding="utf8") as fp:
+        json.dump(CONFIGS[request.param], fp)
     config = configuration.get_config(cfg.strpath)
     this_app = create_app(config)
     this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
@@ -105,7 +105,8 @@ def parametrized_setup(request, tmpdir):
 def docker_setup(request, tmpdir):
     from postgraas_server.management_resources import db
     cfg = tmpdir.join('config')
-    cfg.write(CONFIGS['docker'])
+    with open(cfg.strpath, "w", encoding="utf8") as fp:
+        json.dump(CONFIGS['docker'], fp)
     this_app = create_app(configuration.get_config(cfg.strpath))
     this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     this_app.use_reloader = False

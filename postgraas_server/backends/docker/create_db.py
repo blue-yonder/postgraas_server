@@ -5,12 +5,13 @@ from postgraas_server.utils import wait_for_postgres
 
 def create_db_container():
     config = get_config()
+    print(config)
     db_credentials = {
-        "db_name": config.get('metadb', 'db_name'),
-        "db_username": config.get('metadb', 'db_username'),
-        "db_pwd": config.get('metadb', 'db_pwd'),
-        "host": config.get('metadb', 'host'),
-        "port": config.get('metadb', 'port')
+        "db_name": config['metadb']['db_name'],
+        "db_username": config['metadb']['db_username'],
+        "db_pwd": config['metadb']['db_pwd'],
+        "host": config['metadb']['host'],
+        "port": config['metadb']['port']
     }
     if pg.check_container_exists('postgraas_master_db'):
         print("warning container already exists")
