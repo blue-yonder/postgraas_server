@@ -1,9 +1,8 @@
-import os
 from configparser import ConfigParser
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+
+import os
+
+from io import StringIO
 from cryptography.fernet import Fernet
 
 import postgraas_server.configuration as cf
@@ -31,7 +30,7 @@ db_username = postgraas_user
 
         config = ConfigParser()
 
-        config.readfp(StringIO(config_string))
+        config.read_file(StringIO(config_string))
         username = cf.get_user(config)
         expected = 'postgraas_user'
 
@@ -44,7 +43,7 @@ db_username = postgraas_user
 '''
         config = ConfigParser()
 
-        config.readfp(StringIO(config_string))
+        config.read_file(StringIO(config_string))
         username = cf.get_user(config)
         expected = 'postgraas_user@testserver1'
 

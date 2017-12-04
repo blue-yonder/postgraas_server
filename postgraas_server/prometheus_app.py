@@ -3,13 +3,14 @@
 
 import logging
 from contextlib import contextmanager
-import configuration as cfg
 
 import click
 import psycopg2
 from flask import Blueprint, Flask, Response, abort
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from prometheus_client.core import REGISTRY, GaugeMetricFamily
+
+import postgraas_server.configuration as cfg
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,6 @@ def count_postgraas_instances(config):
 
 
 class CustomCollector(object):
-
     def __init__(self, config):
         self.metric_name = 'number_of_postgraas_instances'
         self.help = 'number of postgraas instances'
@@ -62,6 +62,7 @@ class CustomCollector(object):
 
     def describe(self):
         yield GaugeMetricFamily(self.metric_name, self.help)
+
 
 blueprint = Blueprint('monitoring', __name__)
 

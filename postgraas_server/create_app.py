@@ -22,8 +22,9 @@ def create_app(config):
     app.config['SQLALCHEMY_DATABASE_URI'] = get_meta_db_config_path(config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app_config = get_application_config(config)
-    for key, value in app_config:
-        app.config[key.upper()] = int(value) if key.upper() in INT_OPTIONS else value
+
+    for key in app_config:
+        app.config[key.upper()] = int(app_config[key]) if key.upper() in INT_OPTIONS else app_config[key]
     app.config['SENTRY_INCLUDE_PATHS'] = [
         'postgraas_server',
     ]

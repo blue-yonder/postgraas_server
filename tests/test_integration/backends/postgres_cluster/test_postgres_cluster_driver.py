@@ -45,12 +45,13 @@ def delete_test_database_and_user(db_name, username, config):
         pgcd.delete_database(db_name, config)
     except ValueError as e:
         pass
-        #print ValueError(e.args[0])
+        # print(ValueError(e.args[0]))
     try:
         pgcd.delete_user(username, config)
     except ValueError as e:
         pass
-        #print ValueError(e.args[0])
+        # print(ValueError(e.args[0]))
+
 
 @pytest.fixture(params=['pg_cluster'])
 def parametrized_setup(request, tmpdir):
