@@ -1,7 +1,7 @@
 import datetime
 import logging
-import psycopg2
 
+import psycopg2
 from flask import current_app
 from flask_restful import fields, Resource, marshal_with, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
@@ -25,14 +25,14 @@ class DBInstance(db.Model):
     container_id = db.Column(db.String(100))
 
     def __init__(
-        self,
-        postgraas_instance_name,
-        db_name,
-        username,
-        password,
-        hostname,
-        port,
-        container_id=None
+            self,
+            postgraas_instance_name,
+            db_name,
+            username,
+            password,
+            hostname,
+            port,
+            container_id=None
     ):
         self.postgraas_instance_name = postgraas_instance_name
         self.creation_timestamp = datetime.datetime.now()
@@ -140,7 +140,7 @@ class DBInstanceCollectionResource(Resource):
                                       ).first():
             return {
                 'msg':
-                "postgraas_instance_name already exists {}".format(args['postgraas_instance_name'])
+                    "postgraas_instance_name already exists {}".format(args['postgraas_instance_name'])
             }
 
         db_credentials = {
@@ -161,8 +161,8 @@ class DBInstanceCollectionResource(Resource):
         )
         if current_app.postgraas_backend.exists(db_entry):
             abort(409,
-                description="database or user already exists {}, {}".format(args['db_name'], args['db_username'])
-            )
+                  description="database or user already exists {}, {}".format(args['db_name'], args['db_username'])
+                  )
 
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)

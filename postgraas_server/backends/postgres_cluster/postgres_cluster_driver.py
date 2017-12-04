@@ -67,7 +67,6 @@ def delete_database(db_name, config):
         raise ValueError(e.args[0])
 
 
-
 def delete_user(username, config):
     con = _create_pg_connection(config)
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)

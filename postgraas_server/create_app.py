@@ -5,9 +5,9 @@ from flask_restful import Api
 from raven.contrib.flask import Sentry
 
 import postgraas_server
-from postgraas_server.management_resources import DBInstanceResource, DBInstanceCollectionResource, db
 from postgraas_server.backends import get_backend
 from postgraas_server.configuration import get_application_config, get_meta_db_config_path
+from postgraas_server.management_resources import DBInstanceResource, DBInstanceCollectionResource, db
 
 INT_OPTIONS = [
     'SQLALCHEMY_POOL_RECYCLE', 'SQLALCHEMY_POOL_SIZE', 'SQLALCHEMY_POOL_TIMEOUT',

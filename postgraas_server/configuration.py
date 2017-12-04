@@ -1,9 +1,9 @@
-import io
-import os
-import json
 import errno
+import json
 import logging
 from configparser import ConfigParser
+
+import os
 
 __all__ = ['get_config', 'get_default_config_filename', 'get_application_config', 'expand_env_vars']
 
@@ -38,7 +38,7 @@ def get_config(config_filename=get_default_config_filename(), secrets_file='/sec
         with open(config_filename, 'rb') as cfg:
             cfg_content = f.decrypt(cfg.read())
         print(cfg_content)
-        config.read_string(cfg_content.decode("utf-8") )
+        config.read_string(cfg_content.decode("utf-8"))
     else:
         config.read(config_filename)
     expand_env_vars(config)

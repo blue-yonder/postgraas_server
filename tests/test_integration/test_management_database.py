@@ -1,5 +1,6 @@
-import os
 import unittest
+
+import os
 
 import postgraas_server.configuration as configuration
 from postgraas_server.create_app import create_app

@@ -1,4 +1,4 @@
-#from . import postgres_instance_driver as pg
+# from . import postgres_instance_driver as pg
 from ..exceptions import PostgraasApiException
 
 
@@ -25,7 +25,6 @@ class DockerBackend(object):
             raise PostgraasApiException("Could not delete, does not exist {}".format(entity.container_id))
         except (APIError, NullResource) as e:
             raise PostgraasApiException(str(e))
-
 
     def exists(self, entity):
         from . import postgres_instance_driver as pg

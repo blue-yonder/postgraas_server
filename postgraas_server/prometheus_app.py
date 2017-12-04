@@ -4,9 +4,9 @@
 import logging
 from contextlib import contextmanager
 import configuration as cfg
-import datetime
-import psycopg2
+
 import click
+import psycopg2
 from flask import Blueprint, Flask, Response, abort
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from prometheus_client.core import REGISTRY, GaugeMetricFamily
@@ -87,7 +87,7 @@ def metrics():
 @click.option("--port", default=8000, help="Set the port for running the web server that is scraped by prometheus")
 def run_server(test, port):
     """
-    This script provides monitoring information concerning the export performed by the aedir-exporter CLI.
+    This script provides monitoring information about the postgraas server.
     """
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
 

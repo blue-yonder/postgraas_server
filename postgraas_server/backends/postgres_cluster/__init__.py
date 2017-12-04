@@ -1,8 +1,8 @@
 from . import postgres_cluster_driver as pgcd
 from ..exceptions import PostgraasApiException
 
-class PGClusterBackend(object):
 
+class PGClusterBackend(object):
     def __init__(self, config):
         self.config = config
 

@@ -1,10 +1,7 @@
-import os
-import json
 import uuid
 
-import docker
+import os
 import pytest
-from mock import patch, MagicMock, Mock
 
 import postgraas_server.backends.docker.postgres_instance_driver as pid
 import postgraas_server.backends.postgres_cluster.postgres_cluster_driver as pgcd
@@ -12,7 +9,6 @@ import postgraas_server.configuration as configuration
 from postgraas_server.backends.exceptions import PostgraasApiException
 from postgraas_server.create_app import create_app
 from postgraas_server.management_resources import DBInstance
-from .utils import wait_for_postgres_listening
 
 DOCKER_CONFIG = """
 [metadb]
@@ -70,15 +66,15 @@ def delete_all_test_database_and_user(config):
     con = pgcd._create_pg_connection(config)
     cur = con.cursor()
     cur.execute(
-'''SELECT d.datname, u.usename 
- FROM pg_database d
-  JOIN pg_user u ON (d.datdba = u.usesysid);''')
+        '''SELECT d.datname, u.usename
+           FROM pg_database d
+           JOIN pg_user u ON (d.datdba = u.usesysid);''')
     for db in cur:
         if db[0].startswith("tests_postgraas_"):
             delete_test_database_and_user(db[0], db[1], config)
     cur.execute(
-'''SELECT u.usename 
- FROM pg_user u;''')
+        '''SELECT u.usename
+           FROM pg_user u;''')
     for db in cur:
         if db[0].startswith("tests_postgraas_"):
             pgcd.delete_user(db[0], config)
@@ -122,7 +118,6 @@ def parametrized_setup(request, tmpdir):
 
 @pytest.mark.usefixtures('parametrized_setup')
 class TestPostgraasApi():
-
     def test_create_and_delete_postgres_instance(self):
         db_credentials = {
             "db_name": 'tests_postgraas_instance_name',

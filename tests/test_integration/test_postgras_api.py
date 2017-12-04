@@ -1,8 +1,8 @@
-import os
 import json
 import uuid
 
 import docker
+import os
 import pytest
 from mock import patch, MagicMock, Mock
 

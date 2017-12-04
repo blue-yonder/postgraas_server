@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## I hate setup bash scripts...but this one sets up a local postgres cluster for the postgres cluster backend...quite handy...
 export PGDATABASE=postgres
 export PGUSER=postgres

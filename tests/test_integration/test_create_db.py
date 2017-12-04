@@ -1,6 +1,7 @@
+from subprocess import check_call
+
 import os
 import pytest
-from subprocess import check_call
 
 import postgraas_server.backends.docker.postgres_instance_driver as pid
 from postgraas_server import init_db
