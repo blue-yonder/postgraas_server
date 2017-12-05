@@ -14,7 +14,7 @@ this_dir = os.path.dirname(__file__)
 def cov_runner():
     # pretty hacky fixture to measure coverage of python scripts started as subprocess.
     # * run the script via 'coverage run', not via python
-    # * move the created .coverage files two to ../.. so they are merged with the others
+    # * move the created .coverage files to ../.. so they are merged with the others
     check_call("rm -f .coverage.*", shell=True, cwd=this_dir)
 
     def run(script):
