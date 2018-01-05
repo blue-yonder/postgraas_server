@@ -1,5 +1,5 @@
 import uuid
-
+import json
 import os
 import pytest
 
@@ -90,8 +90,9 @@ def delete_test_database_and_user(db_name, username, config):
 def parametrized_setup(request, tmpdir):
     from postgraas_server.management_resources import db
     cfg = tmpdir.join('config')
-    with open(cfg.strpath, "w", encoding="utf8") as fp:
+    with open(cfg.strpath, "w") as fp:
         json.dump(CONFIGS[request.param], fp)
+
     config = configuration.get_config(cfg.strpath)
     this_app = create_app(config)
     this_app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
