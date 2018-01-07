@@ -7,7 +7,7 @@ from sqlalchemy.orm import RelationshipProperty
 logger = logging.getLogger(__name__)
 
 
-def is_sane_database(Base, session):
+def is_sane_database(Base, session):  # pragma: no cover
     """
     from: http://stackoverflow.com/questions/30428639/check-database-schema-matches-sqlalchemy-models-on-application-startup
     Check whether the current database matches the models declared in model base.

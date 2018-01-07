@@ -14,7 +14,7 @@ def get_default_config_filename():
     return config_filename
 
 
-def _load_secrets(filename='/secrets'):
+def _load_secrets(filename='/secrets'): # pragma: no cover
     try:
         with open(filename, 'r') as secrets_file:
             secrets = json.load(secrets_file)
@@ -31,7 +31,7 @@ def get_config(config_filename=get_default_config_filename(), secrets_file='/sec
     with open(config_filename, 'r') as cfg:
         config = json.load(cfg)
     secrets = _load_secrets(filename=secrets_file)
-    if secrets:
+    if secrets: # pragma: no cover
         try:
             import secure_config.secrets as sec
             config = sec.load_secret_dict(password=secrets['encryption_key'], config_dict=config)
