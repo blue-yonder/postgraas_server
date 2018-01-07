@@ -5,6 +5,7 @@ Changelog
 latest
 ======
 
+- add support for secure-config (experimental)
 - add support for simple Postgres Cluster as backend
 - add support for sentry (https://sentry.io)
 - bugfix: varchar(50) field in the DB too small for hostname
