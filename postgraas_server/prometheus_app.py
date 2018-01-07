@@ -21,11 +21,11 @@ _NO_TRACING = 0
 def db_connection(config):
     username = cfg.get_user(config)
     connection = psycopg2.connect(
-        database=config.get('metadb', 'db_name'),
+        database=config['metadb']['db_name'],
         user=username,
-        password=config.get('metadb', 'db_pwd'),
-        host=config.get('metadb', 'host'),
-        port=config.get('metadb', 'port')
+        password=config['metadb']['db_pwd'],
+        host=config['metadb']['host'],
+        port=config['metadb']['port']
     )
     yield connection
     connection.close()
