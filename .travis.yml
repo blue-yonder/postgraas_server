@@ -21,7 +21,7 @@ install:
 - pip-compile --upgrade -o test-requirements-pinned.txt requirements-pinned.txt requirements_dev.txt
 - cat requirements-pinned.txt
 - pip install -r test-requirements-pinned.txt
-- pip install pyscaffold
+- pip install 'pyscaffold<3.0'
 - pip install coveralls
 - pip install -e .[docker]
 - pip freeze

@@ -2,10 +2,15 @@
 Changelog
 =========
 
-latest
-======
+v2.0.0b1
+========
 
+- breaking change: config not ini anymore, but json
 - add support for secure-config (experimental)
+
+v1.0.0b3
+========
+
 - add support for simple Postgres Cluster as backend
 - add support for sentry (https://sentry.io)
 - bugfix: varchar(50) field in the DB too small for hostname
