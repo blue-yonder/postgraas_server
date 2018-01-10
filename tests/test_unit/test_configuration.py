@@ -70,3 +70,45 @@ class TestConfiguration:
         assert config_undecrypted['metadb']["db_password"] == expected_secret.dumps()
         config_decrypted = cf.get_config(test_config, secrets_file=secret_file)
         assert config_decrypted['metadb']["db_password"].decrypt() == "correct_db_password"
+
+    @pytest.mark.skipif(not HAS_SECURE_CONFIG,
+                        reason="secure_config not installed")
+    def test_get_meta_db_config_path(self, tmpdir):
+        config_dict = {
+                "metadb": {
+                    "host": "thisserver.host",
+                    "db_pwd": "$SECRET;0.1;AES256|613839656430373831386237333266306163376563343632663138346163323162333830333861666263326330663238346361666165313266373363316236370a613135396239326632663739376364313466616535333733626165333738303166303761366132633033346433376263393734643132336432393764623465330a65353264343035353236643533303464333561393637643966663165663739656130613435366564383065303834303066613338353631663430613061623833",
+                    "port": "5432",
+                    "db_name": "postgres",
+                    "db_username": "postgraas_user",
+                    "server": "thisserver"
+               }
+            }
+
+        config = secure_config.secrets.load_secret_dict(password="v3rys3cur3", config_dict=config_dict)
+        metadb_string = cf.get_meta_db_config_path(config)
+        print(metadb_string)
+        assert metadb_string == "postgresql://postgraas_user@thisserver:correct_db_password@thisserver.host:5432/postgres"
+
+    @pytest.mark.skipif(not HAS_SECURE_CONFIG,
+                        reason="secure_config not installed")
+    def test_get_secure_password(self, tmpdir):
+        config_dict = {
+                "metadb": {
+                    "db_pwd": "$SECRET;0.1;AES256|613839656430373831386237333266306163376563343632663138346163323162333830333861666263326330663238346361666165313266373363316236370a613135396239326632663739376364313466616535333733626165333738303166303761366132633033346433376263393734643132336432393764623465330a65353264343035353236643533303464333561393637643966663165663739656130613435366564383065303834303066613338353631663430613061623833",
+               }
+            }
+        config = secure_config.secrets.load_secret_dict(password="v3rys3cur3", config_dict=config_dict)
+        password_string = cf.get_password(config)
+        print(password_string)
+        assert password_string == "correct_db_password"
+
+    def test_get_plain_password(self, tmpdir):
+        config_dict = {
+                "metadb": {
+                    "db_pwd": "v3rys3cur3",
+               }
+            }
+        password_string = cf.get_password(config_dict)
+        print(password_string)
+        assert password_string == "v3rys3cur3"

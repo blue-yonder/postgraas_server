@@ -50,11 +50,11 @@ def get_application_config(config):
 
 def get_meta_db_config_path(config):
     username = get_user(config)
-
+    password = get_password(config)
     db_path = 'postgresql://{db_username}:{db_pwd}@{host}:{port}/{db_name}'.format(
         db_name=config['metadb']['db_name'],
         db_username=username,
-        db_pwd=config['metadb']['db_pwd'],
+        db_pwd=password,
         host=config['metadb']['host'],
         port=config['metadb']['port']
     )
@@ -68,3 +68,11 @@ def get_user(config):
     except KeyError:
         username = config['metadb']['db_username']
     return username
+
+
+def get_password(config):
+    try:
+        password = config['metadb']['db_pwd'].decrypt()
+    except AttributeError:
+        password = config['metadb']['db_pwd']
+    return password
