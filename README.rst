@@ -64,3 +64,30 @@ We are now able to connect to the database for exaple with psql::
     psql -h localhost -p 54648 -U db_user my_db
 
 Awesome, isn’t it?
+
+Development
+===========
+
+Run the tests
+-------------
+
+You need to have docker installed
+
+Make sure you pull the right docker image::
+
+    docker pull postgres:9.4
+
+Make a virtualenv and install the requirements including the dev requirements and a local editable intsall
+of the package, for convenience you can install the requirements.in ::
+
+    pip install -r requirements.in
+    pip install -r requirements_dev.txt
+
+For the tests you need a running postgres meta database and set some enviroonment variables accordingly.
+There is a convenience script to set this all up using a docker postgres database::
+
+    . setup_integration_test_docker.sh
+
+Now you should be able to execute the tests::
+
+    py.test tests/
