@@ -167,6 +167,7 @@ class TestPostgraasApi():
         self.this_app.postgraas_backend.delete(db_entry)
         assert True
 
+    @pytest.mark.xfail(reason='Username now valid due to hardening against SQL injections.')
     def test_create_postgraas_bad_username(self):
         db_credentials = {
             "db_name": 'tests_postgraas_instance_name',

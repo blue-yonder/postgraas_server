@@ -193,6 +193,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
                                       backend_config)
         assert ("database or user already exists" in json.loads(response.get_data(as_text=True))['description']) is True
 
+    @pytest.mark.xfail(reason='Username now valid due to hardening against SQL injections.')
     def test_create_postgres_instance_bad_username(self):
         backend_config = CONFIGS[self.backend]['backend']
         db_credentials = {
