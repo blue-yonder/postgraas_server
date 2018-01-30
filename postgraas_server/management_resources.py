@@ -77,23 +77,19 @@ class DBInstanceResource(Resource):
         if not entity:
             return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}
 
-        connection_error = None
         try:
-            conn = psycopg2.connect(
+            with psycopg2.connect(
                 user=entity.username,
                 password=args['db_pwd'],
                 host=current_app.postgraas_backend.master_hostname,
                 port=entity.port,
                 dbname=entity.db_name
-            )
-            conn.close()
+            ):
+                pass
         except Exception as ex:
-            connection_error = str(ex)
-
-        if connection_error is not None:
             return {
                 'status': 'failed',
-                'msg': 'Could not connect to postgres instance: {}'.format(connection_error)
+                'msg': 'Could not connect to postgres instance: {}'.format(str(ex))
             }
 
         if not current_app.postgraas_backend.exists(entity):

@@ -20,26 +20,25 @@ _NO_TRACING = 0
 @contextmanager
 def db_connection(config):
     username = cfg.get_user(config)
-    connection = psycopg2.connect(
+    with psycopg2.connect(
         database=config['metadb']['db_name'],
         user=username,
         password=config['metadb']['db_pwd'],
         host=config['metadb']['host'],
         port=config['metadb']['port']
-    )
-    yield connection
-    connection.close()
+    ) as connection:
+        yield connection
 
 
 def do_count_query(config):
     with db_connection(config) as conn:
-        cursor = conn.cursor()
-        sql = (
-            "SELECT count(*) FROM pg_database "
-            "WHERE datistemplate = false;"
-        )
-        cursor.execute(sql)
-        (count,) = cursor.fetchone()
+        with conn.cursor() as cursor:
+            sql = (
+                "SELECT count(*) FROM pg_database "
+                "WHERE datistemplate = false;"
+            )
+            cursor.execute(sql)
+            (count,) = cursor.fetchone()
 
     return count
 
