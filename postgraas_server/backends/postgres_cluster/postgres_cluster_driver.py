@@ -69,7 +69,9 @@ def delete_database(db_name, config):
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         with con.cursor() as cur:
             try:
-                cur.execute('''DROP DATABASE "{}";'''.format(db_name))
+                cur.execute(SQL('DROP DATABASE {};').format(
+                    Identifier(db_name),
+                ))
             except psycopg2.ProgrammingError as e:
                 raise ValueError(e.args[0])
 
@@ -79,6 +81,8 @@ def delete_user(username, config):
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         with con.cursor() as cur:
             try:
-                cur.execute('''DROP USER "{}";'''.format(get_normalized_username(username)))
+                cur.execute(SQL('DROP USER {};').format(
+                   Identifier(get_normalized_username(username)),
+                ))
             except psycopg2.ProgrammingError as e:
                 raise ValueError(e.args[0])
