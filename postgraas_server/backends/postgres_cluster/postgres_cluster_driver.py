@@ -54,7 +54,7 @@ def create_postgres_db(connection_dict, config):
                     Identifier(connection_dict['db_username']),
                 ))
             except psycopg2.ProgrammingError as e:
-                cur.execute(SQL("DROP ROLE {};").format(
+                cur.execute(SQL("DROP USER {};").format(
                     Identifier(connection_dict['db_username']),
                 ))
                 raise ValueError(e.args[0])
