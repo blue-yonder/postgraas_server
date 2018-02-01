@@ -2,10 +2,11 @@
 Changelog
 =========
 
-UNRELEASED
-==========
+v2.0.0
+======
 
 - security: Harden the Postgres cluster backend against SQL injections.
+- hardened the server against leaking of database connections and transactions.
 
 v2.0.0b1
 ========
