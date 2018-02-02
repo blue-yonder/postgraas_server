@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v2.0.1 (UNRLEASED)
+==================
+
+- prevent creation of databases with an empty password as those cannot be removed.
+
 v2.0.0
 ======
 

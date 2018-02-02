@@ -383,3 +383,22 @@ class TestPostgraasApi(PostgraasApiTestBase):
         assert actual_data == expected
 
         self.delete_instance_by_name(db_credentials, self.app_client)
+
+    def test_empty_password(self):
+        instance_name = "test_empty_password"
+        db_credentials = {
+            "postgraas_instance_name": instance_name,
+            "db_name": self.db_name,
+            "db_username": self.username,
+            "db_pwd": "",
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        created_db = json.loads(result.get_data(as_text=True))
+
+        assert result.status_code == 400
+        print(created_db)
+        assert 'password may not be empty' in created_db["msg"]
