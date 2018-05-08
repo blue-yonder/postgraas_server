@@ -342,6 +342,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
         second = self.app_client.post(
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
+        assert second.status_code == 409  # Conflict
         assert second.get_data(as_text=True) == json.dumps(
             {
                 "msg": "postgraas_instance_name already exists tests_postgraas_my_postgraas_twice"

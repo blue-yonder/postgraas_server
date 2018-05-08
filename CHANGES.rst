@@ -6,6 +6,8 @@ v2.0.1 (UNRLEASED)
 ==================
 
 - prevent creation of databases with an empty password as those cannot be removed.
+- return http status code 409 instead of 200 in case of a name conflict during creation of a new
+  instance. 
 
 v2.0.0
 ======
