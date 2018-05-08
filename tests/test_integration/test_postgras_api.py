@@ -126,22 +126,24 @@ def docker_setup(request, tmpdir):
 class PostgraasApiTestBase:
     def get_postgraas_by_name(self, name, client):
         headers = {'Content-Type': 'application/json'}
-        list = client.get('/api/v2/postgraas_instances', headers=headers)
-        for instance in json.loads(list.get_data(as_text=True)):
+        instances = client.get('/api/v2/postgraas_instances', headers=headers)
+        for instance in json.loads(instances.get_data(as_text=True)):
             if instance["postgraas_instance_name"] == name:
                 return instance["id"]
+        return None
 
     def delete_instance_by_name(self, db_credentials, client):
-        id = self.get_postgraas_by_name(db_credentials["postgraas_instance_name"], client)
-        db_pwd = db_credentials["db_pwd"]
-        headers = {'Content-Type': 'application/json'}
-        client.delete(
-            '/api/v2/postgraas_instances/' + str(id),
-            data=json.dumps({
-                'db_pwd': db_pwd
-            }),
-            headers=headers
-        )
+        instance_id = self.get_postgraas_by_name(db_credentials["postgraas_instance_name"], client)
+        if instance_id is not None:
+            db_pwd = db_credentials["db_pwd"]
+            headers = {'Content-Type': 'application/json'}
+            client.delete(
+                '/api/v2/postgraas_instances/' + str(instance_id),
+                data=json.dumps({
+                    'db_pwd': db_pwd
+                }),
+                headers=headers
+            )
 
 
 @pytest.mark.usefixtures('docker_setup')
@@ -382,3 +384,22 @@ class TestPostgraasApi(PostgraasApiTestBase):
         assert actual_data == expected
 
         self.delete_instance_by_name(db_credentials, self.app_client)
+
+    def test_empty_password(self):
+        instance_name = "test_empty_password"
+        db_credentials = {
+            "postgraas_instance_name": instance_name,
+            "db_name": self.db_name,
+            "db_username": self.username,
+            "db_pwd": "",
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        created_db = json.loads(result.get_data(as_text=True))
+
+        assert result.status_code == 400
+        print(created_db)
+        assert 'password may not be empty' in created_db["msg"]

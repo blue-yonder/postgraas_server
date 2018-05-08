@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import psycopg2
@@ -131,6 +132,9 @@ class DBInstanceCollectionResource(Resource):
         parser.add_argument('db_username', required=True, type=str, help='username of the db')
         parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
         args = parser.parse_args()
+
+        if not args['db_pwd']:
+            abort(400, msg='The password may not be empty.')
 
         if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']
                                       ).first():
