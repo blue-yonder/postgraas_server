@@ -19,8 +19,10 @@ sentry = Sentry(logging=True, level=logging.WARN, wrap_wsgi=True)
 
 def create_app(config):
     app = Flask(__name__)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = get_meta_db_config_path(config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['BUNDLE_ERRORS'] = True
     app_config = get_application_config(config)
 
     for key in app_config:

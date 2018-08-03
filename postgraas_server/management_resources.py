@@ -71,12 +71,12 @@ class DBInstanceResource(Resource):
 
     def delete(self, id):
         parser = reqparse.RequestParser()
-        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
+        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user is needed to delete instance.')
         args = parser.parse_args()
 
         entity = DBInstance.query.get(id)
         if not entity:
-            return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}
+            return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}, 404
 
         try:
             with psycopg2.connect(
@@ -91,7 +91,7 @@ class DBInstanceResource(Resource):
             return {
                 'status': 'failed',
                 'msg': 'Could not connect to postgres instance: {}'.format(str(ex))
-            }
+            }, 401
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(

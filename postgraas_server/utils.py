@@ -11,6 +11,6 @@ def wait_for_postgres(dbname, user, password, host, port):
         try:
             psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
             return
-        except psycopg2.OperationalError:
-            print(i, " ..waiting for db")
+        except psycopg2.OperationalError as error:
+            print(i, " ..waiting for db, error: {}".format(error))
             time.sleep(1)
