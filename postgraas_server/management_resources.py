@@ -3,7 +3,7 @@ import json
 import logging
 
 import psycopg2
-from flask import current_app, jsonify, make_response
+from flask import current_app
 from flask_restful import fields, Resource, marshal_with, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
 
