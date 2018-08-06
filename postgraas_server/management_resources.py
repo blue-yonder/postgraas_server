@@ -71,12 +71,14 @@ class DBInstanceResource(Resource):
 
     def delete(self, id):
         parser = reqparse.RequestParser()
-        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
+        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user is needed to delete instance.')
         args = parser.parse_args()
 
         entity = DBInstance.query.get(id)
         if not entity:
-            return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}
+            abort(404, status='failed', 
+                       msg='Postgraas instance {} does not exist'.format(id)
+            )
 
         try:
             with psycopg2.connect(
@@ -88,10 +90,10 @@ class DBInstanceResource(Resource):
             ):
                 pass
         except Exception as ex:
-            return {
-                'status': 'failed',
-                'msg': 'Could not connect to postgres instance: {}'.format(str(ex))
-            }
+            return_code = 401 if 'authentication failed' in str(ex) else 500
+            abort(return_code, status='failed',
+                               msg='Could not connect to postgres instance: {}'.format(str(ex))
+            )
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(
@@ -108,7 +110,7 @@ class DBInstanceResource(Resource):
             current_app.postgraas_backend.delete(entity)
         except PostgraasApiException as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
-            return {'status': 'failed', 'msg': str(e)}
+            abort(500, status='failed', msg=str(e))
         db.session.delete(entity)
         db.session.commit()
         return {'status': 'success', 'msg': 'deleted postgraas instance'}
@@ -172,7 +174,7 @@ class DBInstanceCollectionResource(Resource):
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
         except PostgraasApiException as e:
-            return {'msg': str(e)}
+            abort(500, msg=str(e))
 
         if '@' not in args['db_username']:
             try:

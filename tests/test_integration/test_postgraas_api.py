@@ -280,7 +280,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
             headers=headers
         )
         deleted_db = json.loads(delete_result.get_data(as_text=True))
-
+        assert delete_result.status_code == 401
         assert deleted_db["status"] == 'failed'
         assert 'password authentication failed' in deleted_db[
             'msg'
@@ -323,6 +323,7 @@ class TestPostgraasApi(PostgraasApiTestBase):
             }),
             headers=headers
         )
+        assert res.status_code == 404
         res = json.loads(res.get_data(as_text=True))
         assert res['status'] == 'failed'
         assert "123456789" in res['msg'], 'unexpected error message'

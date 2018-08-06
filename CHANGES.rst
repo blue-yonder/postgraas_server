@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v2.0.2
+======
+
+- return proper HTTP status codes, when deleting postgraas instances
+
 v2.0.1
 ======
 
