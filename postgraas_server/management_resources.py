@@ -3,7 +3,7 @@ import json
 import logging
 
 import psycopg2
-from flask import current_app
+from flask import current_app, jsonify, make_response
 from flask_restful import fields, Resource, marshal_with, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
 
@@ -76,7 +76,9 @@ class DBInstanceResource(Resource):
 
         entity = DBInstance.query.get(id)
         if not entity:
-            return {'status': 'failed', 'msg': 'Postgraas instance {} does not exist'.format(id)}, 404
+            abort(404, status='failed', 
+                       msg='Postgraas instance {} does not exist'.format(id)
+            )
 
         try:
             with psycopg2.connect(
@@ -89,10 +91,9 @@ class DBInstanceResource(Resource):
                 pass
         except Exception as ex:
             return_code = 401 if 'authentication failed' in str(ex) else 500
-            return {
-                'status': 'failed',
-                'msg': 'Could not connect to postgres instance: {}'.format(str(ex))
-            }, return_code
+            abort(return_code, status='failed',
+                               msg='Could not connect to postgres instance: {}'.format(str(ex))
+            )
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(
@@ -109,7 +110,7 @@ class DBInstanceResource(Resource):
             current_app.postgraas_backend.delete(entity)
         except PostgraasApiException as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
-            return {'status': 'failed', 'msg': str(e)}, 500
+            abort(500, status='failed', msg=str(e))
         db.session.delete(entity)
         db.session.commit()
         return {'status': 'success', 'msg': 'deleted postgraas instance'}
@@ -173,7 +174,7 @@ class DBInstanceCollectionResource(Resource):
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
         except PostgraasApiException as e:
-            return {'msg': str(e)}, 500
+            abort(500, msg=str(e))
 
         if '@' not in args['db_username']:
             try:
