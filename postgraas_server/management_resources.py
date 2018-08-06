@@ -88,10 +88,11 @@ class DBInstanceResource(Resource):
             ):
                 pass
         except Exception as ex:
+            return_code = 401 if 'authentication failed' in str(ex) else 500
             return {
                 'status': 'failed',
                 'msg': 'Could not connect to postgres instance: {}'.format(str(ex))
-            }, 401
+            }, return_code
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(
@@ -108,7 +109,7 @@ class DBInstanceResource(Resource):
             current_app.postgraas_backend.delete(entity)
         except PostgraasApiException as e:
             logger.warning("error deleting container {}: {}".format(entity.container_id, str(e)))
-            return {'status': 'failed', 'msg': str(e)}
+            return {'status': 'failed', 'msg': str(e)}, 500
         db.session.delete(entity)
         db.session.commit()
         return {'status': 'success', 'msg': 'deleted postgraas instance'}
@@ -172,7 +173,7 @@ class DBInstanceCollectionResource(Resource):
         try:
             db_entry.container_id = current_app.postgraas_backend.create(db_entry, db_credentials)
         except PostgraasApiException as e:
-            return {'msg': str(e)}
+            return {'msg': str(e)}, 500
 
         if '@' not in args['db_username']:
             try:
