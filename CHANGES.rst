@@ -2,6 +2,11 @@
 Changelog
 =========
 
+UNRELEASED
+==========
+
+- Fix log messages of Gunicorn and Flask not ending up in the root logger.
+
 v2.0.2
 ======
 

@@ -14,7 +14,7 @@ INT_OPTIONS = [
     'SQLALCHEMY_MAX_OVERFLOW'
 ]
 
-sentry = Sentry(logging=True, level=logging.WARN, wrap_wsgi=True)
+sentry = Sentry(logging=True, level=logging.WARN, wrap_wsgi=True, logging_exclusions=())
 
 
 def create_app(config):
