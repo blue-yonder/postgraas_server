@@ -3,4 +3,4 @@ flask
 flask-restful
 flask-sqlalchemy
 psycopg2
-raven
+raven[flask]
