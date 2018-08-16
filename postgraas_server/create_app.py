@@ -32,8 +32,6 @@ def create_app(config):
     ]
     app.config['SENTRY_RELEASE'] = postgraas_server.__version__
     sentry.init_app(app)
-    from raven.handlers.logging import SentryHandler
-    app.logger.addHandler(SentryHandler(client=sentry.client, level=logging.WARN))
 
     restful_api = Api(app)
     restful_api.add_resource(DBInstanceResource, "/api/v2/postgraas_instances/<int:id>")
