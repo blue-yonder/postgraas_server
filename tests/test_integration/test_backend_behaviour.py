@@ -41,7 +41,7 @@ CLUSTER_CONFIG = {
         "port": os.environ.get('PGPORT', '5432'),
         "database": os.environ.get('PGDATABASE', 'postgres'),
         "username": os.environ.get('PGUSER', 'postgres'),
-        "password": os.environ.get('PGPASSWORD', 'postgres')
+        "password": os.environ.get('PGPASSWORD', 'postgres'),
     }
 }
 

@@ -42,7 +42,7 @@ def create_postgres_db(connection_dict, config):
                 ))
                 cur.execute(SQL("GRANT {} TO {};").format(
                     Identifier(connection_dict['db_username']),
-                    Identifier(get_normalized_username(config['username'])),
+                    Identifier(config['username']),
                 ))
             except psycopg2.ProgrammingError as e:
                 raise ValueError(e.args[0])

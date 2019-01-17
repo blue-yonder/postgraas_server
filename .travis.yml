@@ -9,10 +9,10 @@ services:
 addons:
   postgresql: "9.4"
 env:
-- PGDATABASE=postgres PGUSER=postgres PGPASSWORD=postgraas_password
+- PGDATABASE=postgres PGUSER=postgres@localhost PGPASSWORD=postgraas_password
 before_install:
 - docker pull postgres:9.4
-- psql -c "alter user $PGUSER with password '$PGPASSWORD';" -U postgres
+- psql -c "alter user '$PGUSER' with password '$PGPASSWORD';" -U postgres
 - sudo sed -ie 's/trust/md5/g' /etc/postgresql/9.4/main/pg_hba.conf
 - sudo service postgresql restart
 install:
