@@ -5,16 +5,9 @@ python:
 - '3.6'
 services:
 - docker
-- postgresql
-addons:
-  postgresql: "9.4"
-env:
-- PGDATABASE=postgres PGUSER=postgres@localhost PGPASSWORD=postgraas_password
 before_install:
 - docker pull postgres:9.4
-- psql -c "alter user '$PGUSER' with password '$PGPASSWORD';" -U postgres
-- sudo sed -ie 's/trust/md5/g' /etc/postgresql/9.4/main/pg_hba.conf
-- sudo service postgresql restart
+- docker pull postgres
 install:
 - pip install pip-tools
 - pip-compile --upgrade -o requirements-pinned.txt requirements.txt requirements_secrets.in requirements_prometheus.in
@@ -25,7 +18,9 @@ install:
 - pip install coveralls
 - pip install -e .[docker]
 - pip freeze
-script: py.test
+script:
+- . setup_integration_test_docker.sh
+- py.test
 after_success:
 - coveralls
 deploy:
