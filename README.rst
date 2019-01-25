@@ -16,7 +16,12 @@ Postgraas is a super simple PostgreSQL-as-a-service
 What is Postgraas?
 ==================
 
-Postgraas offers `CRUD <https://de.wikipedia.org/wiki/CRUD>`_ operations for complete PostgreSQL database instances via a simple REST api. The database instances are docker containers and the api server is a few hundred LoC Flask application. It is of not meant as a production ready solution, but more a proof-of-concept to spread the idea of creating "as-a-service" services easily yourself and should inspire you to start working on your own cloud infrastructure today. But in fact, it proofs the concept very well and it turned out to be super useful for delivering a PostgreSQL instance if you need one fast: for integration tests, for playing around with fancy ShowHN projects or other experiments. The CRUD management via REST api is of course also a necessary prequisite for building an automated continuous delivery pipeline for a modern software project. 
+Postgraas offers `CRUD <https://de.wikipedia.org/wiki/CRUD>`_ operations for complete PostgreSQL database instances via a simple REST api.
+The database instances are docker containers and the API server is a few hundred LoC Flask application.
+It is not meant as a production ready solution, but more as a proof-of-concept to spread the idea of creating "as-a-service" services easily yourself and should inspire you to start working on your own cloud infrastructure today.
+But in fact, it proofs the concept very well and it turned out to be super useful for delivering a PostgreSQL instance if you need one fast, e.g. for integration tests, for playing around with fancy ShowHN projects or other experiments.
+The CRUD management via REST api is of course also a necessary prerequisite for building an automated continuous delivery pipeline for a modern software project.
+
 
 Installation
 ============
@@ -25,16 +30,18 @@ You can find detailed instructions in the `docs <http://postgraas-server.readthe
 Install via pip::
 
     pip install postgraas_server
-    
-And start the wsgi api server for example with gunicorn::
 
+Start the WSGI api server for example via gunicorn::
+
+    pip install gunicorn
     gunicorn -w 4 -b 0.0.0.0:8080 postgraas_server.postgraas_api:app
-    
+
 
 Usage
 =====
 
-We need to send all the required parameters for the creation as an http request. This is quite convenient by creating a file e.g. ``my_postgraas.json``::
+We need to send all the required parameters for the creation as an http request.
+This is quite convenient by creating a file e.g. ``my_postgraas.json``::
 
     {
         "postgraas_instance_name": "my_postgraas",
@@ -59,7 +66,7 @@ now your instance is created and as a response you get the details of your insta
          "port": 54648
     }
 
-We are now able to connect to the database for exaple with psql::
+We are now able to connect to the database for example via ``psql``::
 
     psql -h localhost -p 54648 -U db_user my_db
 
@@ -75,19 +82,20 @@ You need to have docker installed
 
 Make sure you pull the right docker image::
 
-    docker pull postgres:9.4
+    docker pull postgres:latest
 
-Make a virtualenv and install the requirements including the dev requirements and a local editable intsall
+Make a virtualenv and install the requirements including the dev requirements and a local editable install
 of the package, for convenience you can install the requirements.in ::
 
     pip install -r requirements.in
     pip install -r requirements_dev.txt
+    pip install -e .
 
-For the tests you need a running postgres meta database and set some enviroonment variables accordingly.
+For the tests you need a running postgres meta database and set some environment variables accordingly.
 There is a convenience script to set this all up using a docker postgres database::
 
     . setup_integration_test_docker.sh
 
 Now you should be able to execute the tests::
 
-    py.test tests/
+    pytest tests/
