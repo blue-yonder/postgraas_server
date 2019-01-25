@@ -1,5 +1,5 @@
 from postgraas_server.backends.docker import postgres_instance_driver as pg
-from postgraas_server.configuration import get_config
+from postgraas_server.configuration import get_config, get_user, get_password
 from postgraas_server.utils import wait_for_postgres
 
 
@@ -8,8 +8,8 @@ def create_db_container():
     print(config)
     db_credentials = {
         "db_name": config['metadb']['db_name'],
-        "db_username": config['metadb']['db_username'],
-        "db_pwd": config['metadb']['db_pwd'],
+        "db_username": get_user(config),
+        "db_pwd": get_password(config),
         "host": config['metadb']['host'],
         "port": config['metadb']['port']
     }

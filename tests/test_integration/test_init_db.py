@@ -7,7 +7,7 @@ import os
 import psycopg2
 from psycopg2.sql import SQL
 
-from postgraas_server.configuration import get_user
+from postgraas_server.configuration import get_user, get_password
 
 
 CLUSTER_CONFIG = {
@@ -28,7 +28,7 @@ def _get_db_con():
             user=get_user(CLUSTER_CONFIG),
             host=CLUSTER_CONFIG['metadb']['host'],
             port=CLUSTER_CONFIG['metadb']['port'],
-            password=CLUSTER_CONFIG['metadb']['db_pwd'],
+            password=get_password(CLUSTER_CONFIG),
     ) as con:
         yield con
 

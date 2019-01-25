@@ -82,7 +82,7 @@ You need to have docker installed
 
 Make sure you pull the right docker image::
 
-    docker pull postgres:latest
+    docker pull postgres:9.4
 
 Make a virtualenv and install the requirements including the dev requirements and a local editable install
 of the package, for convenience you can install the requirements.in ::
