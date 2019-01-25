@@ -26,7 +26,8 @@ def _load_secrets(filename='/secrets'): # pragma: no cover
     return secrets
 
 
-def get_config(config_filename=get_default_config_filename(), secrets_file='/secrets'):
+def get_config(config_filename=None, secrets_file='/secrets'):
+    config_filename = config_filename or get_default_config_filename()
     logger.debug('config filename: {}'.format(config_filename))
     with open(config_filename, 'r') as cfg:
         config = json.load(cfg)
