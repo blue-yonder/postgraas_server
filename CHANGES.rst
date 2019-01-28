@@ -2,7 +2,7 @@
 Changelog
 =========
 
-UNRELEASED
+v2.1.0
 ==========
 
 - init-db now constructs usernames identical to the server. Thus, `user@host` names now work properly.
@@ -18,7 +18,7 @@ v2.0.1
 
 - prevent creation of databases with an empty password as those cannot be removed.
 - return http status code 409 instead of 200 in case of a name conflict during creation of a new
-  instance. 
+  instance.
 
 v2.0.0
 ======
