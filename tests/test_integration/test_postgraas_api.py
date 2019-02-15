@@ -160,6 +160,22 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
         assert created_db["db_name"] == 'test_create_postgres_instance'
         self.delete_instance_by_name(db_credentials, self.app_client)
 
+    def test_create_postgres_instance_api_with_fully_qualified_user(self):
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "db_user@tests_postgraas_test_create_postgres_instance_api",
+            "db_pwd": "secret"
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        created_db = json.loads(result.get_data(as_text=True))
+        assert created_db["db_name"] == 'test_create_postgres_instance'
+        self.delete_instance_by_name(db_credentials, self.app_client)
+
     def test_create_docker_fails(self):
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
@@ -242,13 +258,30 @@ class TestPostgraasApi(PostgraasApiTestBase):
             "port": pid.get_open_port()
         }
         mock_c = MagicMock()
-        mock_c.id = 'fy8rfsufusgsufbvluluivhhvsbr'
+        mock_c.id = 'EW3uvF3C3tLce9Eo5D76NbQe'
         mock_create = Mock(return_value=mock_c)
         with patch.object(docker.models.containers.ContainerCollection, 'create', mock_create):
             result = pid.create_postgres_instance(
                 'tests_postgraas_test_instance_name', db_credentials
             )
-        assert result == 'fy8rfsufusgsufbvluluivhhvsbr'
+        assert result == 'EW3uvF3C3tLce9Eo5D76NbQe'
+
+    def test_create_postgres_instance_with_fully_qualified_username(self):
+        db_credentials = {
+            "db_name": 'test_db_name',
+            "db_username": 'test_db_username@{}'.format(pid.get_hostname()),
+            "db_pwd": 'test_db_pwd',
+            "host": pid.get_hostname(),
+            "port": pid.get_open_port()
+        }
+        mock_c = MagicMock()
+        mock_c.id = 'dN4IsDN5eOqeCgli23MlxeTA'
+        mock_create = Mock(return_value=mock_c)
+        with patch.object(docker.models.containers.ContainerCollection, 'create', mock_create):
+            result = pid.create_postgres_instance(
+                'tests_postgraas_test_instance_name', db_credentials
+            )
+        assert result == 'dN4IsDN5eOqeCgli23MlxeTA'
 
     def test_delete_postgres_instance_api(self):
         db_credentials = {

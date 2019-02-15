@@ -186,5 +186,5 @@ class DBInstanceCollectionResource(Resource):
         db.session.commit()
         db_credentials["container_id"] = db_entry.container_id
         db_credentials["postgraas_instance_id"] = db_entry.id
-        db_credentials["db_username"] = username
+        db_credentials["db_username"] = db_entry.username
         return db_credentials, 201
