@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 
 import psycopg2
@@ -26,14 +25,14 @@ class DBInstance(db.Model):
     container_id = db.Column(db.String(100))
 
     def __init__(
-        self,
-        postgraas_instance_name,
-        db_name,
-        username,
-        password,
-        hostname,
-        port,
-        container_id=None
+            self,
+            postgraas_instance_name,
+            db_name,
+            username,
+            password,
+            hostname,
+            port,
+            container_id=None
     ):
         self.postgraas_instance_name = postgraas_instance_name
         self.creation_timestamp = datetime.datetime.now()
@@ -76,24 +75,24 @@ class DBInstanceResource(Resource):
 
         entity = DBInstance.query.get(id)
         if not entity:
-            abort(404, status='failed', 
-                       msg='Postgraas instance {} does not exist'.format(id)
-            )
+            abort(404, status='failed',
+                  msg='Postgraas instance {} does not exist'.format(id)
+                  )
 
         try:
             with psycopg2.connect(
-                user=entity.username,
-                password=args['db_pwd'],
-                host=current_app.postgraas_backend.master_hostname,
-                port=entity.port,
-                dbname=entity.db_name
+                    user=entity.username,
+                    password=args['db_pwd'],
+                    host=current_app.postgraas_backend.master_hostname,
+                    port=entity.port,
+                    dbname=entity.db_name
             ):
                 pass
         except Exception as ex:
             return_code = 401 if 'authentication failed' in str(ex) else 500
             abort(return_code, status='failed',
-                               msg='Could not connect to postgres instance: {}'.format(str(ex))
-            )
+                  msg='Could not connect to postgres instance: {}'.format(str(ex))
+                  )
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(
@@ -130,9 +129,9 @@ class DBInstanceCollectionResource(Resource):
             type=str,
             help='name of the postgraas instance'
         )
-        parser.add_argument('db_name', required=True, type=str, help='name of the db')
-        parser.add_argument('db_username', required=True, type=str, help='username of the db')
-        parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user')
+        parser.add_argument('db_name', required=True, type=str, help='Database name')
+        parser.add_argument('db_username', required=True, type=str, help="Username of database user")
+        parser.add_argument('db_pwd', required=True, type=str, help='Password of the database user')
         args = parser.parse_args()
 
         if not args['db_pwd']:

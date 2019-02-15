@@ -1,8 +1,8 @@
 import json
+import os
 import uuid
 
 import docker
-import os
 import pytest
 from mock import patch, MagicMock, Mock
 
@@ -14,31 +14,27 @@ from postgraas_server.create_app import create_app
 from .utils import wait_for_postgres_listening
 
 DOCKER_CONFIG = {
-    "metadb":
-    {
+    "metadb": {
         "db_name": "postgraas",
         "db_username": "postgraas",
         "db_pwd": "postgraas12",
         "host": "localhost",
         "port": "54321"
     },
-    "backend":
-    {
+    "backend": {
         "type": "docker"
     }
 }
 
 CLUSTER_CONFIG = {
-    "metadb":
-    {
+    "metadb": {
         "db_name": "postgraas",
         "db_username": "postgraas",
         "db_pwd": "postgraas12",
         "host": "localhost",
         "port": "54321"
     },
-    "backend":
-    {
+    "backend": {
         "type": "pg_cluster",
         "host": os.environ.get('PGHOST', 'localhost'),
         "port": os.environ.get('PGPORT', '5432'),
@@ -123,7 +119,7 @@ def docker_setup(request, tmpdir):
     ctx.pop()
 
 
-class PostgraasApiTestBase:
+class PostgraasApiTestBase(object):
     def get_postgraas_by_name(self, name, client):
         headers = {'Content-Type': 'application/json'}
         instances = client.get('/api/v2/postgraas_instances', headers=headers)
