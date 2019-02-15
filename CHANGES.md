@@ -2,8 +2,13 @@
 Changelog
 =========
 
+v2.1.1
+======
+
+- Allow user to supply username in the format `user@host` himself.
+
 v2.1.0
-==========
+======
 
 - init-db now constructs usernames identical to the server. Thus, `user@host` names now work properly.
 - Fix log messages of Gunicorn and Flask not ending up in the root logger.`
@@ -80,5 +85,3 @@ v0.1.0
 ======
 
 - First running version
-
-

@@ -14,6 +14,7 @@ except ImportError:
 import postgraas_server.configuration as cf
 import pytest
 
+
 class TestConfiguration:
     module_path = os.path.abspath(os.path.dirname(__file__))
 
