@@ -176,6 +176,51 @@ class TestPostgraasApiDocker(PostgraasApiTestBase):
         assert created_db["db_name"] == 'test_create_postgres_instance'
         self.delete_instance_by_name(db_credentials, self.app_client)
 
+    def test_create_postgres_instance_api_with_postgres_as_user(self):
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "postgres",
+            "db_pwd": "secret"
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        assert result.status_code == 422
+        self.delete_instance_by_name(db_credentials, self.app_client)
+
+    def test_create_postgres_instance_api_with_postgres_at_example_com_as_user(self):
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "postgres@example.com",
+            "db_pwd": "secret"
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        assert result.status_code == 422
+        self.delete_instance_by_name(db_credentials, self.app_client)
+
+    def test_create_postgres_instance_api_with_postgres_at_localhost_as_user(self):
+        db_credentials = {
+            "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",
+            "db_name": "test_create_postgres_instance",
+            "db_username": "postgres@localhost",
+            "db_pwd": "secret"
+        }
+        self.delete_instance_by_name(db_credentials, self.app_client)
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        assert result.status_code == 422
+        self.delete_instance_by_name(db_credentials, self.app_client)
+
     def test_create_docker_fails(self):
         db_credentials = {
             "postgraas_instance_name": "tests_postgraas_test_create_postgres_instance_api",

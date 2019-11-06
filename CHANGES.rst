@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v2.1.2
+======
+
+- Blacklist postgres as username
+
 v2.1.1
 ======
 
