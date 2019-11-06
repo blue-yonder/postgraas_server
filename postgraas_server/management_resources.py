@@ -137,6 +137,12 @@ class DBInstanceCollectionResource(Resource):
         if not args['db_pwd']:
             abort(400, msg='The password may not be empty.')
 
+        if args['db_username'] == "postgres" or  args['db_username'].startswith("postgres@"):
+            abort(
+                422,
+                msg="username {} is backlisted".format(args['db_username'])
+            )
+
         if DBInstance.query.filter_by(postgraas_instance_name=args['postgraas_instance_name']
                                       ).first():
             abort(
