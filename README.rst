@@ -75,27 +75,43 @@ Awesome, isn’t it?
 Development
 ===========
 
-Run the tests
--------------
+You can follow the next steps in order to host postgraas_server locally and be able to develop features or bug fixes:
 
-You need to have docker installed
+Clone repository::
 
-Make sure you pull the right docker image::
+    git clone https://github.com/blue-yonder/postgraas_server
+
+*[optional]* Create and run a virtual environment
+
+This step will help you to not install all needed python packages on your home computer, but in a virtual disposable environment so it doesn't cause any trouble with your local setup::
+
+    python -m venv postgraas_server/
+    cd postgraas_server
+    source bin/activate
+
+Install all the project dependencies::
+
+    pip install -r requirements_dev.txt
+    pip install -r requirements_docker.in
+    pip install gunicorn
+    pip install -e .
+
+Pull the right docker image::
 
     docker pull postgres:9.4
 
-Make a virtualenv and install the requirements including the dev requirements and a local editable install
-of the package, for convenience you can install the requirements.in ::
+Run a Docker container with the postgres image::
 
-    pip install -r requirements.in
-    pip install -r requirements_dev.txt
-    pip install -e .
+    postgraas_init
 
-For the tests you need a running postgres meta database and set some environment variables accordingly.
-There is a convenience script to set this all up using a docker postgres database::
+Run gunicorn to initialize the web service on your localhost::
 
-    . setup_integration_test_docker.sh
+    gunicorn -w 4 -b 0.0.0.0:8080 postgraas_server.postgraas_api:app
 
-Now you should be able to execute the tests::
+After this your application should be started and you can perform GET/POST/DELETE actions to this endppoint::
 
-    pytest tests/
+    http://localhost:8080/api/v2/postgraas_instances
+
+Alternatively, you can run your unit and integration testings to verify your new code::
+
+     pytest tests/
