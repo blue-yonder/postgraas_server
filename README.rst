@@ -81,9 +81,9 @@ Clone repository::
 
     git clone https://github.com/blue-yonder/postgraas_server
 
-*[optional]* Create and run a virtual environment
+**[optional]** Create and run a virtual environment
 
-This step will help you to not install all needed python packages on your home computer, but in a virtual disposable environment so it doesn't cause any trouble with your local setup::
+*This step will help you to not install all needed python packages on your home computer, but in a virtual disposable environment so it doesn't cause any trouble with your local setup*::
 
     python -m venv postgraas_server/
     cd postgraas_server
