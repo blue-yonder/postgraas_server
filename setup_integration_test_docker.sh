@@ -3,7 +3,7 @@
 export PGDATABASE=postgres
 export PGUSER=postgres@localhost
 export PGPASSWORD=mysecret
-export PGPORT=54320
+export PGPORT=5432
 export PGHOST=localhost
 
 docker run --name some-postgres -e POSTGRES_PASSWORD=$PGPASSWORD -e POSTGRES_USER=$PGUSER -e POSTGRES_DB=$PGDATABASE -p $PGPORT:5432 -d postgres

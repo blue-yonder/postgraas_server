@@ -81,7 +81,7 @@ Clone repository::
 
     git clone https://github.com/blue-yonder/postgraas_server
 
-**[optional]** Create and run a virtual environment
+*[optional]* Create and run a virtual environment
 
 *This step will help you to not install all needed python packages on your home computer, but in a virtual disposable environment so it doesn't cause any trouble with your local setup*::
 
@@ -96,21 +96,74 @@ Install all the project dependencies::
     pip install gunicorn
     pip install -e .
 
+Docker
+-----------------
+
 Pull the right docker image::
 
     docker pull postgres:9.4
+
+Your application.cfg file should look like this::
+
+    {
+        "metadb":
+        {
+            "db_name": "postgres",
+            "db_username": "postgres@",
+            "db_pwd": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        },
+        "backend":
+        {
+            "type": "docker"
+        }
+    }
+
+Initialize a postgres DB within a docker container::
+
+    sh setup_integration_test_docker.sh
 
 Run a Docker container with the postgres image::
 
     postgraas_init
 
-Run gunicorn to initialize the web service on your localhost::
+Postgres Cluster
+-----------------
 
-    gunicorn -w 4 -b 0.0.0.0:8080 postgraas_server.postgraas_api:app
+If you don't want to use Docker as the backend you could create a local postgres cluster
+
+Your application.cfg file should look like this::
+
+    {
+        "backend":
+        {
+            "type": "pg_cluster",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        }
+    }
+
+Run postgres server::
+
+    postgres -D /usr/local/var/postgres
+
+
+Run Flask application
+
+Execute application locally
+-----------------
+
+Run the application by executing this command::
+
+    python postgraas_server/postgraas_api.py
 
 After this your application should be started and you can perform GET/POST/DELETE actions to this endppoint::
 
-    http://localhost:8080/api/v2/postgraas_instances
+    http://localhost:5000/api/v2/postgraas_instances
 
 Alternatively, you can run your unit and integration testings to verify your new code::
 
