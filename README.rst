@@ -151,13 +151,10 @@ Run postgres server::
 
     postgres -D /usr/local/var/postgres
 
-
-Run Flask application
-
 Execute application locally
 -----------------
 
-Run the application by executing this command::
+Run the Flask application by executing this command::
 
     python postgraas_server/postgraas_api.py
 
