@@ -109,7 +109,7 @@ Your application.cfg file should look like this::
         "metadb":
         {
             "db_name": "postgres",
-            "db_username": "postgres@",
+            "db_username": "postgres",
             "db_pwd": "mysecret",
             "host": "localhost",
             "port": "5432"
@@ -136,6 +136,14 @@ If you don't want to use Docker as the backend you could create a local postgres
 Your application.cfg file should look like this::
 
     {
+        "metadb":
+        {
+            "db_name": "postgres",
+            "db_username": "postgres",
+            "db_pwd": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        },
         "backend":
         {
             "type": "pg_cluster",

@@ -72,6 +72,7 @@ class DBInstanceResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('db_pwd', required=True, type=str, help='pass of the db user is needed to delete instance.')
         args = parser.parse_args()
+        conn = None
 
         entity = DBInstance.query.get(id)
         if not entity:
@@ -86,13 +87,24 @@ class DBInstanceResource(Resource):
                     host=current_app.postgraas_backend.master_hostname,
                     port=entity.port,
                     dbname=entity.db_name
-            ):
+            ) as conn:
                 pass
         except Exception as ex:
             return_code = 401 if 'authentication failed' in str(ex) else 500
             abort(return_code, status='failed',
                   msg='Could not connect to postgres instance: {}'.format(str(ex))
                   )
+
+        try:
+            cur = conn.cursor()
+            cur.execute("select count(pid) from pg_stat_activitylo;")
+            sessions = cur.fetchone()
+            if sessions[0] > 1:
+                abort(409, status='failed',
+                msg='Database contains active sessions, please close them before deleting instance'.format(id)
+                )
+        except Exception:
+            pass
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(
