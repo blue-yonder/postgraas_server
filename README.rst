@@ -60,7 +60,7 @@ now your instance is created and as a response you get the details of your insta
          "postgraas_instance_id": 1,
          "container_id": "193f0d94d49fa26626fdbdb583e9453f923468b01eac59207b4852831a105c03",
          "db_pwd": "secret",
-         "host": "not imlemented yet",
+         "host": "not implemented yet",
          "db_name": "my_db",
          "db_username": "db_user",
          "port": 54648
