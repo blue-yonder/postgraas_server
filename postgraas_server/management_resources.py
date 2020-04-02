@@ -94,8 +94,6 @@ class DBInstanceResource(Resource):
         except Exception as ex:
             return_code = 401 if 'authentication failed' in str(ex) else 500
             abort(return_code, status='failed', msg='Could not connect to postgres instance: {}'.format(str(ex)))
-        #finally:
-            #conn.close()
 
         if other_sessions > 0:
             abort(409, status='failed', msg='Database contains other {} active sessions. Please close or terminate all sessions before deleting'.format(other_sessions))

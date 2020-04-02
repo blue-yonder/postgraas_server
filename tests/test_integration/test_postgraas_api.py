@@ -415,7 +415,6 @@ class TestPostgraasApi(PostgraasApiTestBase):
             '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
         )
         created_db = json.loads(result.get_data(as_text=True))
-        #print("----- CREATE: {}".format(created_db))
 
         if self.backend == 'docker':
             wait_success = wait_for_postgres_listening(created_db['container_id'])
@@ -442,7 +441,6 @@ class TestPostgraasApi(PostgraasApiTestBase):
         assert 'active sessions' in deleted_db[
             'msg'
         ], 'unexpected message for active sessions in the database'
-        #print("----- FIRST DELETE: {}".format(delete_result.get_data(as_text=True)))
 
         conn.close()
 
@@ -453,7 +451,6 @@ class TestPostgraasApi(PostgraasApiTestBase):
             }),
             headers=headers
         )
-        #print("----- SECOND DELETE: {}".format(delete_result.get_data(as_text=True)))
 
         deleted_db = json.loads(delete_result.get_data(as_text=True))
         assert delete_result.status_code == 200
