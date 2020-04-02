@@ -9,8 +9,6 @@
 __pycache__/*
 .cache/*
 .*.swp
-bin/*
-lib/*
 
 # Project files
 .ropeproject
@@ -42,6 +40,3 @@ cover/*
 MANIFEST
 pyvenv.cfg
 application.cfg
-
-#Mac auto-generated files
-**/.DS_Store

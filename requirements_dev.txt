@@ -3,4 +3,3 @@ httpretty
 pytest
 pytest-cov
 sphinx
-prometheus_client

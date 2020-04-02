@@ -4,6 +4,7 @@ import uuid
 
 import docker
 import pytest
+import psycopg2
 from mock import patch, MagicMock, Mock
 
 import postgraas_server.backends.docker.postgres_instance_driver as pid
@@ -401,6 +402,62 @@ class TestPostgraasApi(PostgraasApiTestBase):
         res = json.loads(res.get_data(as_text=True))
         assert res['status'] == 'failed'
         assert "123456789" in res['msg'], 'unexpected error message'
+
+    def test_delete_postgres_instance_api_with_active_sessions(self):
+        db_credentials = {
+            "postgraas_instance_name": "test_active_sessions_instance",
+            "db_name": "test_active_sessions_db",
+            "db_username": "test_active_sessions_user",
+            "db_pwd": "secret"
+        }
+        headers = {'Content-Type': 'application/json'}
+        result = self.app_client.post(
+            '/api/v2/postgraas_instances', headers=headers, data=json.dumps(db_credentials)
+        )
+        created_db = json.loads(result.get_data(as_text=True))
+        #print("----- CREATE: {}".format(created_db))
+
+        if self.backend == 'docker':
+            wait_success = wait_for_postgres_listening(created_db['container_id'])
+            assert wait_success is True, 'postgres did not come up within 10s (or unexpected docker image log output)'
+
+        conn = psycopg2.connect(
+            user=db_credentials["db_username"],
+            password=db_credentials["db_pwd"],
+            host=os.environ.get('PGHOST', 'localhost'),
+            port=created_db["port"],
+            dbname=db_credentials["db_name"]
+        )
+
+        delete_result = self.app_client.delete(
+            '/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+            data=json.dumps({
+                'db_pwd': db_credentials['db_pwd']
+            }),
+            headers=headers
+        )
+        deleted_db = json.loads(delete_result.get_data(as_text=True))
+        assert delete_result.status_code == 409
+        assert deleted_db["status"] == 'failed'
+        assert 'active sessions' in deleted_db[
+            'msg'
+        ], 'unexpected message for active sessions in the database'
+        #print("----- FIRST DELETE: {}".format(delete_result.get_data(as_text=True)))
+
+        conn.close()
+
+        delete_result = self.app_client.delete(
+            '/api/v2/postgraas_instances/' + str(created_db["postgraas_instance_id"]),
+            data=json.dumps({
+                'db_pwd': db_credentials['db_pwd']
+            }),
+            headers=headers
+        )
+        #print("----- SECOND DELETE: {}".format(delete_result.get_data(as_text=True)))
+
+        deleted_db = json.loads(delete_result.get_data(as_text=True))
+        assert delete_result.status_code == 200
+        assert deleted_db["status"] == 'success'
 
     def test_create_postgres_instance_name_exists(self):
         db_credentials = {

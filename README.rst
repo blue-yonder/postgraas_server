@@ -81,18 +81,11 @@ Clone repository::
 
     git clone https://github.com/blue-yonder/postgraas_server
 
-*[optional]* Create and run a virtual environment
-
-*This step will help you to not install all needed python packages on your home computer, but in a virtual disposable environment so it doesn't cause any trouble with your local setup*::
-
-    python -m venv postgraas_server/
-    cd postgraas_server
-    source bin/activate
-
 Install all the project dependencies::
 
     pip install -r requirements_dev.txt
     pip install -r requirements_docker.in
+    pip install -r requirements_prometheus.in 
     pip install gunicorn
     pip install -e .
 
@@ -170,6 +163,6 @@ After this your application should be started and you can perform GET/POST/DELET
 
     http://localhost:5000/api/v2/postgraas_instances
 
-Alternatively, you can run your unit and integration testings to verify your new code::
+Alternatively, you can run your unit and integration tests to verify your new code::
 
-     pytest tests/
+    pytest tests/
