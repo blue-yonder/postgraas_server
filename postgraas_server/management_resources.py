@@ -7,6 +7,7 @@ from flask_restful import fields, Resource, marshal_with, reqparse, abort
 from flask_sqlalchemy import SQLAlchemy
 
 from postgraas_server.backends.exceptions import PostgraasApiException
+from contextlib import closing
 
 logger = logging.getLogger(__name__)
 
@@ -75,24 +76,27 @@ class DBInstanceResource(Resource):
 
         entity = DBInstance.query.get(id)
         if not entity:
-            abort(404, status='failed',
-                  msg='Postgraas instance {} does not exist'.format(id)
-                  )
+            abort(404, status='failed', msg='Postgraas instance {} does not exist'.format(id))
+
+        other_sessions = 0
 
         try:
-            with psycopg2.connect(
+            with closing(psycopg2.connect(
                     user=entity.username,
                     password=args['db_pwd'],
                     host=current_app.postgraas_backend.master_hostname,
                     port=entity.port,
                     dbname=entity.db_name
-            ):
-                pass
+            )) as conn:
+                cur = conn.cursor()
+                cur.execute("select count(pid) from pg_stat_activity where datname = %s ;", (entity.db_name,))
+                other_sessions = cur.fetchone()[0]-1
         except Exception as ex:
             return_code = 401 if 'authentication failed' in str(ex) else 500
-            abort(return_code, status='failed',
-                  msg='Could not connect to postgres instance: {}'.format(str(ex))
-                  )
+            abort(return_code, status='failed', msg='Could not connect to postgres instance: {}'.format(str(ex)))
+
+        if other_sessions > 0:
+            abort(409, status='failed', msg='Database contains other {} active sessions. Please close or terminate all sessions before deleting'.format(other_sessions))
 
         if not current_app.postgraas_backend.exists(entity):
             logger.warning(

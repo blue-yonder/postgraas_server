@@ -3,7 +3,7 @@ import docker
 
 def get_hostname():
     # mmmh, how should this be done? need nome kind ouf routing...
-    return 'not imlemented yet'
+    return 'not implemented yet'
 
 
 def _docker_client():

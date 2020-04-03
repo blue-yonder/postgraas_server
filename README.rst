@@ -60,7 +60,7 @@ now your instance is created and as a response you get the details of your insta
          "postgraas_instance_id": 1,
          "container_id": "193f0d94d49fa26626fdbdb583e9453f923468b01eac59207b4852831a105c03",
          "db_pwd": "secret",
-         "host": "not imlemented yet",
+         "host": "not implemented yet",
          "db_name": "my_db",
          "db_username": "db_user",
          "port": 54648
@@ -75,27 +75,94 @@ Awesome, isn’t it?
 Development
 ===========
 
-Run the tests
--------------
+You can follow the next steps in order to host postgraas_server locally and be able to develop features or bug fixes:
 
-You need to have docker installed
+Clone repository::
 
-Make sure you pull the right docker image::
+    git clone https://github.com/blue-yonder/postgraas_server
+
+Install all the project dependencies::
+
+    pip install -r requirements_dev.txt
+    pip install -r requirements_docker.in
+    pip install -r requirements_prometheus.in 
+    pip install gunicorn
+    pip install -e .
+
+Docker
+-----------------
+
+Pull the right docker image::
 
     docker pull postgres:9.4
 
-Make a virtualenv and install the requirements including the dev requirements and a local editable install
-of the package, for convenience you can install the requirements.in ::
+Your application.cfg file should look like this::
 
-    pip install -r requirements.in
-    pip install -r requirements_dev.txt
-    pip install -e .
+    {
+        "metadb":
+        {
+            "db_name": "postgres",
+            "db_username": "postgres",
+            "db_pwd": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        },
+        "backend":
+        {
+            "type": "docker"
+        }
+    }
 
-For the tests you need a running postgres meta database and set some environment variables accordingly.
-There is a convenience script to set this all up using a docker postgres database::
+Initialize a postgres DB within a docker container::
 
-    . setup_integration_test_docker.sh
+    sh setup_integration_test_docker.sh
 
-Now you should be able to execute the tests::
+Run a Docker container with the postgres image::
+
+    postgraas_init
+
+Postgres Cluster
+-----------------
+
+If you don't want to use Docker as the backend you could create a local postgres cluster
+
+Your application.cfg file should look like this::
+
+    {
+        "metadb":
+        {
+            "db_name": "postgres",
+            "db_username": "postgres",
+            "db_pwd": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        },
+        "backend":
+        {
+            "type": "pg_cluster",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "mysecret",
+            "host": "localhost",
+            "port": "5432"
+        }
+    }
+
+Run postgres server::
+
+    postgres -D /usr/local/var/postgres
+
+Execute application locally
+-----------------
+
+Run the Flask application by executing this command::
+
+    python postgraas_server/postgraas_api.py
+
+After this your application should be started and you can perform GET/POST/DELETE actions to this endppoint::
+
+    http://localhost:5000/api/v2/postgraas_instances
+
+Alternatively, you can run your unit and integration tests to verify your new code::
 
     pytest tests/

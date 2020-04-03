@@ -38,3 +38,5 @@ docs/api/*
 docs/_build/*
 cover/*
 MANIFEST
+pyvenv.cfg
+application.cfg
