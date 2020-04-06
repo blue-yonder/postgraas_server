@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v2.1.3
+======
+
+- Prevent internal server errors upon database delete when there are multiple active sessions
+
 v2.1.2
 ======
 
