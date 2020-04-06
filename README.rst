@@ -90,7 +90,7 @@ Install all the project dependencies::
     pip install -e .
 
 Docker
------------------
+------
 
 Pull the right docker image::
 
@@ -122,7 +122,7 @@ Run a Docker container with the postgres image::
     postgraas_init
 
 Postgres Cluster
------------------
+----------------
 
 If you don't want to use Docker as the backend you could create a local postgres cluster
 
@@ -153,7 +153,7 @@ Run postgres server::
     postgres -D /usr/local/var/postgres
 
 Execute application locally
------------------
+---------------------------
 
 Run the Flask application by executing this command::
 

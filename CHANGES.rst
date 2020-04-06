@@ -2,6 +2,11 @@
 Changelog
 =========
 
+v2.1.4
+======
+
+- Fixed some errors in README.rst that prevented successfull build
+
 v2.1.3
 ======
 
